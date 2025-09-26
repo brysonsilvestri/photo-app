@@ -16,6 +16,9 @@
       --box-light: #f2f2f2;
       --border-light: #ccc;
       --chatgpt-blue: #0a7cff;
+      --sidebar-bg: #ffffff;
+      --sidebar-hover: #f8f9fa;
+      --module-spacing: 1.5rem;
     }
 
     body {
@@ -23,6 +26,243 @@
       font-family: 'Inter', sans-serif;
       color: var(--text-light);
       overflow-x: hidden;
+      padding: var(--module-spacing);
+    }
+
+    /* Modular layout */
+    .main-container {
+      display: flex;
+      gap: var(--module-spacing);
+      max-width: 1400px;
+      margin: 0 auto;
+      min-height: calc(100vh - 3rem);
+      align-items: stretch;
+    }
+    
+    /* No sidebar layout when not authenticated */
+    .main-container.no-sidebar {
+      justify-content: center;
+    }
+    
+    .main-container.no-sidebar .main-content {
+      max-width: 900px;
+    }
+
+    /* Sidebar module for generation history */
+    .generation-sidebar {
+      width: 320px;
+      background: var(--sidebar-bg);
+      border-radius: 1rem;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .generation-sidebar.collapsed {
+      width: 60px;
+    }
+
+    .generation-sidebar.collapsed .sidebar-content {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .generation-sidebar.collapsed .collapse-btn {
+      transform: rotate(180deg);
+    }
+
+    .generation-sidebar.collapsed .sidebar-header {
+      padding: 1rem 0;
+      justify-content: center;
+    }
+
+    .generation-sidebar.collapsed .sidebar-title {
+      display: none;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #333;
+      margin: 0;
+    }
+
+    .collapse-btn {
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 0.375rem;
+      color: #666;
+      cursor: pointer;
+      padding: 0.125rem 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+      font-size: 0.875rem;
+      line-height: 1;
+    }
+
+    .collapse-btn:hover {
+      color: var(--chatgpt-blue);
+      background-color: rgba(10, 124, 255, 0.05);
+      border-color: rgba(10, 124, 255, 0.2);
+    }
+
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .generation-item {
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      color: inherit;
+      margin: 0 1rem 0.5rem 1rem;
+      border-radius: 0.5rem;
+    }
+
+    .generation-item:hover {
+      background-color: var(--sidebar-hover);
+    }
+
+    .generation-item.active {
+      background-color: #e8f0ff;
+      position: relative;
+    }
+
+    .generation-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background-color: var(--chatgpt-blue);
+      border-radius: 0 3px 3px 0;
+    }
+
+    .generation-thumb {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 0.375rem;
+      border: 1px solid #e5e5e5;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .generation-item:hover .generation-thumb {
+      border-color: var(--chatgpt-blue);
+    }
+
+    .generation-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .generation-date {
+      font-size: 0.75rem;
+      color: #999;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .generation-time {
+      font-size: 0.8125rem;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .empty-history {
+      padding: 2rem 1.5rem;
+      text-align: center;
+      color: #999;
+      font-size: 0.875rem;
+    }
+
+    /* Hide/show elements based on collapsed state */
+    .generation-sidebar.collapsed .generation-item span,
+    .generation-sidebar.collapsed .generation-info,
+    .generation-sidebar.collapsed .empty-history,
+    .generation-sidebar.collapsed .new-generation-btn {
+      display: none;
+    }
+
+    .generation-sidebar.collapsed .generation-item {
+      justify-content: center;
+      margin: 0.5rem;
+      padding: 0.5rem;
+      position: relative;
+    }
+
+    .generation-sidebar.collapsed .generation-thumb {
+      width: 36px;
+      height: 36px;
+      transition: transform 0.2s ease;
+    }
+    
+    .generation-sidebar.collapsed .generation-item:hover .generation-thumb {
+      transform: scale(1.1);
+    }
+    
+    /* Tooltip for collapsed sidebar */
+    .generation-sidebar.collapsed .generation-item:hover::after {
+      content: attr(data-date);
+      position: absolute;
+      left: 100%;
+      margin-left: 10px;
+      background: #333;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      white-space: nowrap;
+      font-size: 0.75rem;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .new-generation-btn {
+      display: block;
+      margin: 0 1rem 1rem 1rem;
+      padding: 0.625rem;
+      background-color: var(--chatgpt-blue);
+      color: white;
+      text-align: center;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: background-color 0.2s ease;
+    }
+
+    .new-generation-btn:hover {
+      background-color: #0968d9;
+      color: white;
+    }
+
+    /* Main content module */
+    .main-content {
+      flex: 1;
+      display: flex;
+      align-items: stretch;
     }
 
     .card {
@@ -30,6 +270,8 @@
       border-radius: 1rem;
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
       animation: fadeUp 0.6s ease-out;
+      width: 100%;
+      background: white;
     }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(30px);} to { opacity: 1; transform: translateY(0);} }
 
@@ -126,103 +368,167 @@
 
     /* Mobile responsive adjustments */
     @media (max-width: 768px) {
-      .user-info { position: static; margin-bottom: 1rem; justify-content: center; }
-      h1.header { margin-top: 0; }
+      body {
+        padding: 1rem;
+      }
+      .main-container {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .generation-sidebar {
+        width: 100%;
+        max-height: 200px;
+      }
+      .generation-sidebar.collapsed {
+        max-height: 60px;
+        width: 100%;
+      }
+      .main-content {
+        padding: 0;
+      }
+      .user-info { 
+        position: static; 
+        margin-bottom: 1rem; 
+        justify-content: center; 
+      }
+      h1.header { 
+        margin-top: 0;
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
 
-<body class="p-4">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-lg-10">
-        <div class="card p-4 p-md-5 position-relative">
+<body>
+  <div class="main-container {% if not (user and user.is_authenticated) %}no-sidebar{% endif %}">
+    <!-- Generation History Module (Left) -->
+    {% if user and user.is_authenticated %}
+    <div class="generation-sidebar" id="sidebarModule">
+      <div class="sidebar-header">
+        <h3 class="sidebar-title">Your Photos</h3>
+        <button class="collapse-btn" onclick="toggleSidebar()">
+          <span>◀</span>
+        </button>
+      </div>
 
-          {% if user and user.is_authenticated %}
-          <div class="user-info">
-            <span class="user-email">{{ user.email }}</span>
-            {% if user.generation_count %}
-              <span class="generation-count">({{ user.generation_count }} images)</span>
-            {% endif %}
-            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
-          </div>
-          {% endif %}
-
-          <h1 class="header" id="dynamicHeader"></h1>
-
-          <!-- Flash Messages -->
-          {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-              {% for category, message in messages %}
-                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
-                  {{ message }}
-                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-              {% endfor %}
-            {% endif %}
-          {% endwith %}
-
-          {% if error %}
-            <div class="alert alert-danger" role="alert">{{ error }}</div>
-          {% endif %}
-
-          {# --- Paywall banner (client-side UX hint; server still enforces) --- #}
-          {% set blocked = (user.is_authenticated and not user.is_subscribed and (user.generation_count or 0) >= 1) if user else False %}
-          {% if blocked %}
-            <div class="alert alert-info d-flex justify-content-between align-items-center">
-              <div>You’ve used your free image. Upgrade to continue.</div>
-              <a class="btn btn-primary btn-sm" href="{{ url_for('upgrade') }}">Upgrade</a>
+      <div class="sidebar-content">
+        {% if user_generations %}
+          <a href="{{ url_for('index') }}" class="new-generation-btn">+ New Generation</a>
+          
+          {% for gen in user_generations %}
+          <a href="{{ url_for('view_generation', generation_id=gen.id) }}" 
+             class="generation-item {% if selected_generation_id == gen.id %}active{% endif %}"
+             data-date="{{ gen.created_at.strftime('%b %d, %I:%M %p') }}">
+            <img src="{{ gen.output_image_path }}" alt="Generation" class="generation-thumb">
+            <div class="generation-info">
+              <div class="generation-time">
+                {{ gen.created_at.strftime('%I:%M %p') }}
+              </div>
+              <div class="generation-date">
+                {{ gen.created_at.strftime('%b %d, %Y') }}
+              </div>
             </div>
-          {% endif %}
+          </a>
+          {% endfor %}
+        {% else %}
+          <div class="empty-history">
+            <p>No images yet</p>
+            <p style="margin-top: 0.5rem;">Upload your first product photo to get started!</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
 
-          <div class="content-wrapper" style="min-height: 500px;">
-            {% if not output_image %}
-            <!-- Unified form: everyone posts here; server decides login/paywall/transform -->
-            <form id="genForm" method="POST" action="{{ url_for('transform') }}" enctype="multipart/form-data" novalidate data-blocked="{{ '1' if blocked else '0' }}">
+    <!-- Generation Tool Module (Right) -->
+    <div class="main-content">
+      <div class="card p-4 p-md-5 position-relative">
+
+            {% if user and user.is_authenticated %}
+            <div class="user-info">
+              <span class="user-email">{{ user.email }}</span>
+              {% if user.generation_count %}
+                <span class="generation-count">({{ user.generation_count }} images)</span>
+              {% endif %}
+              <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+            </div>
+            {% endif %}
+
+            <h1 class="header" id="dynamicHeader"></h1>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            {% if error %}
+              <div class="alert alert-danger" role="alert">{{ error }}</div>
+            {% endif %}
+
+            {# --- Paywall banner (client-side UX hint; server still enforces) --- #}
+            {% set blocked = (user.is_authenticated and not user.is_subscribed and (user.generation_count or 0) >= 1) if user else False %}
+            {% if blocked %}
+              <div class="alert alert-info d-flex justify-content-between align-items-center">
+                <div>You've used your free image. Upgrade to continue.</div>
+                <a class="btn btn-primary btn-sm" href="{{ url_for('upgrade') }}">Upgrade</a>
+              </div>
+            {% endif %}
+
+            <div class="content-wrapper" style="min-height: 500px;">
+              {% if not output_image %}
+              <!-- Unified form: everyone posts here; server decides login/paywall/transform -->
+              <form id="genForm" method="POST" action="{{ url_for('transform') }}" enctype="multipart/form-data" novalidate data-blocked="{{ '1' if blocked else '0' }}">
+                <div class="row justify-content-center">
+                  <div class="col-md-6 mb-4">
+                    <div class="form-text form-hint">
+                      Tip: Use a well-lit iPhone photo. PNG/JPG/WEBP up to 20MB.
+                    </div>
+                    <div id="uploadPlaceholder" class="upload-box mt-2">
+                      <div class="upload-icon">＋</div>
+                      <div class="upload-text">Upload photo</div>
+                    </div>
+                    <div id="previewWrapper" class="image-wrapper hidden mt-3">
+                      <button type="button" id="removeBtn" class="remove-btn">&times;</button>
+                      <img id="preview" class="preview-img" src="" alt="Image Preview" />
+                    </div>
+                  </div>
+                  <div class="col-md-4 d-flex align-items-center">
+                    <div class="w-100">
+                      <input type="file" name="image" id="image" accept="image/png,image/jpeg,image/webp" class="form-control hidden" required />
+                      <button id="submitBtn" class="btn btn-dark btn-lg w-100 btn-icon" type="submit" disabled>
+                        {% if blocked %}Upgrade to Continue →{% else %}Transform →{% endif %}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+              {% else %}
+              <!-- Result view -->
               <div class="row justify-content-center">
-                <div class="col-md-6 mb-4">
-                  <div class="form-text form-hint">
-                    Tip: Use a well-lit iPhone photo. PNG/JPG/WEBP up to 20MB.
-                  </div>
-                  <div id="uploadPlaceholder" class="upload-box mt-2">
-                    <div class="upload-icon">＋</div>
-                    <div class="upload-text">Upload photo</div>
-                  </div>
-                  <div id="previewWrapper" class="image-wrapper hidden mt-3">
-                    <button type="button" id="removeBtn" class="remove-btn">&times;</button>
-                    <img id="preview" class="preview-img" src="" alt="Image Preview" />
-                  </div>
+                <div class="col-md-6">
+                  <img src="{{ output_image }}" alt="AI Generated Image" class="output-img" />
                 </div>
-                <div class="col-md-4 d-flex align-items-center">
-                  <div class="w-100">
-                    <input type="file" name="image" id="image" accept="image/png,image/jpeg,image/webp" class="form-control hidden" required />
-                    <button id="submitBtn" class="btn btn-dark btn-lg w-100 btn-icon" type="submit" disabled>
-                      {% if blocked %}Upgrade to Continue →{% else %}Transform →{% endif %}
-                    </button>
-                  </div>
+                <div class="col-md-4 d-flex flex-column align-items-center justify-content-center">
+                  {% if input_image %}
+                    <img src="{{ input_image }}" alt="Uploaded Image Thumbnail" class="thumbnail-img" />
+                  {% endif %}
+                  {% if output_image %}
+                    <a class="btn download-btn w-100 mt-3" href="{{ output_image }}" download>Download</a>
+                  {% endif %}
+                  <a href="{{ url_for('index') }}" class="btn new-image-btn w-100">New Image</a>
                 </div>
               </div>
-            </form>
-            {% else %}
-            <!-- Result view -->
-            <div class="row justify-content-center">
-              <div class="col-md-6">
-                <img src="{{ output_image }}" alt="AI Generated Image" class="output-img" />
-              </div>
-              <div class="col-md-4 d-flex flex-column align-items-center justify-content-center">
-                {% if input_image %}
-                  <img src="{{ input_image }}" alt="Uploaded Image Thumbnail" class="thumbnail-img" />
-                {% endif %}
-                {% if output_image %}
-                  <a class="btn download-btn w-100 mt-3" href="{{ output_image }}" download>Download</a>
-                {% endif %}
-                <a href="{{ url_for('index') }}" class="btn new-image-btn w-100">New Image</a>
-              </div>
+              {% endif %}
             </div>
-            {% endif %}
-          </div>
 
-        </div>
+          </div>
       </div>
     </div>
   </div>
@@ -234,6 +540,24 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
+    // Sidebar collapse functionality
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebarModule');
+      sidebar.classList.toggle('collapsed');
+      
+      // Save state to localStorage
+      const isCollapsed = sidebar.classList.contains('collapsed');
+      localStorage.setItem('sidebarCollapsed', isCollapsed);
+    }
+
+    // Restore sidebar state on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+      if (isCollapsed) {
+        document.getElementById('sidebarModule')?.classList.add('collapsed');
+      }
+    });
+
     // Header behavior: type on initial (no output), set immediately when showing result
     const header = document.getElementById("dynamicHeader");
     const text = "Stunning product photos in seconds.";

@@ -64,6 +64,9 @@ class User(UserMixin, db.Model):
     # Paywall fields
     is_subscribed = db.Column(db.Boolean, default=False, nullable=False)
     stripe_customer_id = db.Column(db.String(120), nullable=True)
+    
+    # Relationship to generations
+    generations = db.relationship('Generation', backref='user', lazy=True, order_by='Generation.created_at.desc()')
 
     def set_password(self, password):
         # pbkdf2:sha256 works well on older Python too
@@ -71,6 +74,15 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+# --- Generation Model ---
+class Generation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    input_image_path = db.Column(db.String(255), nullable=False)
+    output_image_path = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    prompt_style = db.Column(db.String(100), default='default')  # For future style options
 
 # --- Mobile upload token model (QR flow) ---
 class MobileUploadToken(db.Model):
@@ -113,6 +125,10 @@ def ensure_stripe_customer(user: User):
 def _column_exists(table: str, column: str) -> bool:
     res = db.session.execute(text(f"PRAGMA table_info({table})")).fetchall()
     return any(row[1] == column for row in res)  # row[1] is the column name
+
+def _table_exists(table: str) -> bool:
+    res = db.session.execute(text("SELECT name FROM sqlite_master WHERE type='table' AND name=:table"), {"table": table}).fetchall()
+    return len(res) > 0
 
 def ensure_paywall_columns():
     # Add columns if missing (safe for SQLite; run once on startup)
@@ -315,6 +331,11 @@ def index():
     free_cap = 1
     used = int(getattr(current_user, "generation_count", 0)) if is_authed else 0
     free_uses_left = max(0, free_cap - used) if not is_subscribed and is_authed else None
+    
+    # Load user's generation history if logged in
+    user_generations = []
+    if is_authed:
+        user_generations = current_user.generations
 
     return render_template(
         "index.html",
@@ -325,6 +346,36 @@ def index():
         is_authed=is_authed,
         is_subscribed=is_subscribed,
         free_uses_left=free_uses_left,
+        user_generations=user_generations,
+    )
+
+# -----------------------
+# Load a previous generation
+# -----------------------
+@app.get("/generation/<int:generation_id>")
+def view_generation(generation_id):
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+    
+    generation = Generation.query.filter_by(id=generation_id, user_id=current_user.id).first()
+    if not generation:
+        flash("Generation not found.", "error")
+        return redirect(url_for('index'))
+    
+    # Load all generations for the sidebar
+    user_generations = current_user.generations
+    
+    return render_template(
+        "index.html",
+        user=current_user,
+        input_image=generation.input_image_path,
+        output_image=generation.output_image_path,
+        error=None,
+        is_authed=True,
+        is_subscribed=current_user.is_subscribed,
+        free_uses_left=None,
+        user_generations=user_generations,
+        selected_generation_id=generation_id,
     )
 
 # -----------------------
@@ -338,7 +389,7 @@ def transform():
 
     # 2) PAYWALL: 1 free successful generation for non-subscribed accounts
     if not current_user.is_subscribed and (current_user.generation_count or 0) >= 1:
-        flash("You’ve used your free image. Upgrade to continue.", "info")
+        flash("You've used your free image. Upgrade to continue.", "info")
         return redirect(url_for('upgrade'))
 
     input_image = None
@@ -355,19 +406,22 @@ def transform():
         filename = secure_filename(file.filename)
         if not filename:
             raise ValueError("Invalid filename.")
+        # Add timestamp to avoid conflicts
+        timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+        filename = f"{timestamp}_{filename}"
         input_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(input_path)
         input_image = "/" + input_path.replace("\\", "/")
 
         # Prepare 1024x1024 PNG
-        resized_path = os.path.join(app.config['UPLOAD_FOLDER'], "resized_input.png")
+        resized_path = os.path.join(app.config['UPLOAD_FOLDER'], f"resized_{timestamp}.png")
         with Image.open(input_path) as img:
             img = img.convert("RGBA")
             img = img.resize((1024, 1024), Image.LANCZOS)
             img.save(resized_path, format="PNG")
 
         # Build mask (top 5% editable)
-        mask_path = os.path.join(app.config['UPLOAD_FOLDER'], "mask.png")
+        mask_path = os.path.join(app.config['UPLOAD_FOLDER'], f"mask_{timestamp}.png")
         mask = Image.new("RGBA", (1024, 1024), (0, 0, 0, 255))
         draw = ImageDraw.Draw(mask)
         edit_height = int(1024 * 0.05)
@@ -392,6 +446,14 @@ def transform():
         save_b64_png_to(output_path, result.data[0].b64_json)
         output_image = "/" + output_path.replace("\\", "/")
 
+        # Save generation to database
+        generation = Generation(
+            user_id=current_user.id,
+            input_image_path=input_image,
+            output_image_path=output_image
+        )
+        db.session.add(generation)
+        
         # Count only on success
         current_user.generation_count = (current_user.generation_count or 0) + 1
         db.session.commit()
@@ -405,6 +467,9 @@ def transform():
     free_cap = 1
     used = int(getattr(current_user, "generation_count", 0))
     free_uses_left = max(0, free_cap - used) if not is_subscribed else None
+    
+    # Load user's generation history
+    user_generations = current_user.generations
 
     # Re-render unified page with results
     return render_template(
@@ -416,6 +481,7 @@ def transform():
         is_authed=is_authed,
         is_subscribed=is_subscribed,
         free_uses_left=free_uses_left,
+        user_generations=user_generations,
     )
 
 # -----------------------
