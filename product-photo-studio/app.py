@@ -11,16 +11,17 @@ from flask_login import (
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
-from PIL import Image, ImageDraw
+from PIL import Image
 from dotenv import load_dotenv
-from openai import OpenAI
+from google import genai
+from google.genai import types
 import stripe
 from sqlalchemy import text
 import qrcode
 
-# --- Env & OpenAI client ---
+# --- Env & Google GenAI client ---
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
 # --- Stripe config (env) ---
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
@@ -98,19 +99,10 @@ class MobileUploadToken(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# --- Fixed prompt ---
-FIXED_PROMPT = (
-    "Identify the main product in this image and isolate it from all nearby objects or distractions. "
-    "Place only the product on a clean, professional studio background with soft, realistic lighting. "
-    "Maintain the original proportions and dimensions of the product exactly as they appear, including its shape, angle, and size. "
-    "It is critically important to maintain the same texture of the original product. "
-    "Retain all visible text, logos, and label details with photorealistic clarity, as if the image were shot for a luxury brand ad like Sephora or Estée Lauder."
-)
-
-def save_b64_png_to(path: str, b64: str):
-    img_bytes = base64.b64decode(b64)
-    with open(path, "wb") as f:
-        f.write(img_bytes)
+# --- Fixed edit instructions ---
+FIXED_PROMPT = """Using the provided image, identify the product in the photo and isolate it from all other objects
+around it. Place it on a white studio background with soft professional lighting. The product should be shot on a 50 mm lens and face directly 
+towards the lens. If and only when the product is a shoe, the product can be placed sideways with the lens."""
 
 # --- Stripe helpers ---
 def ensure_stripe_customer(user: User):
@@ -413,38 +405,35 @@ def transform():
         file.save(input_path)
         input_image = "/" + input_path.replace("\\", "/")
 
-        # Prepare 1024x1024 PNG
-        resized_path = os.path.join(app.config['UPLOAD_FOLDER'], f"resized_{timestamp}.png")
+        # Prepare image for Google GenAI (resize to 1024x1024)
         with Image.open(input_path) as img:
-            img = img.convert("RGBA")
+            img = img.convert("RGB")  # Google GenAI works best with RGB
             img = img.resize((1024, 1024), Image.LANCZOS)
-            img.save(resized_path, format="PNG")
-
-        # Build mask (top 5% editable)
-        mask_path = os.path.join(app.config['UPLOAD_FOLDER'], f"mask_{timestamp}.png")
-        mask = Image.new("RGBA", (1024, 1024), (0, 0, 0, 255))
-        draw = ImageDraw.Draw(mask)
-        edit_height = int(1024 * 0.05)
-        draw.rectangle([0, 0, 1024, edit_height], fill=(0, 0, 0, 0))
-        mask.save(mask_path, format="PNG")
-
-        # OpenAI call
-        with open(resized_path, "rb") as image_file, open(mask_path, "rb") as mask_file:
-            result = client.images.edit(
-                model="gpt-image-1",
-                prompt=FIXED_PROMPT,
-                image=image_file,
-                mask=mask_file,
-                size="1024x1024"
+            
+            # Use Google Generative AI to transform the image
+            response = client.models.generate_content(
+                model="gemini-2.5-flash-image-preview",
+                contents=[img, FIXED_PROMPT],
             )
-
-        # Save result
-        base_name, _ = os.path.splitext(filename)
-        safe_base = secure_filename(base_name) or "output"
-        output_filename = f"gptimg_out_{safe_base}.png"
-        output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
-        save_b64_png_to(output_path, result.data[0].b64_json)
-        output_image = "/" + output_path.replace("\\", "/")
+            
+            # Extract the generated image from response
+            image_parts = [
+                part.inline_data.data
+                for part in response.candidates[0].content.parts
+                if part.inline_data
+            ]
+            
+            if not image_parts:
+                raise ValueError("No image was generated in the response")
+            
+            # Save the generated image
+            generated_image = Image.open(BytesIO(image_parts[0]))
+            base_name, _ = os.path.splitext(filename)
+            safe_base = secure_filename(base_name) or "output"
+            output_filename = f"genai_out_{safe_base}.png"
+            output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
+            generated_image.save(output_path, format="PNG")
+            output_image = "/" + output_path.replace("\\", "/")
 
         # Save generation to database
         generation = Generation(
@@ -459,7 +448,8 @@ def transform():
         db.session.commit()
 
     except Exception as e:
-        error = str(e)
+        error = f"Error generating image: {str(e)}"
+        flash(error, "error")
 
     # Recompute paywall context when returning the page with results
     is_authed = True

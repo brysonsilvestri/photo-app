@@ -1,6 +1,9 @@
 flask
 python-dotenv
-openai
+google-genai
 flask-login
 flask-sqlalchemy
 email-validator
+stripe
+qrcode
+pillow
