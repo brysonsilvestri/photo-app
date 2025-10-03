@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <!-- SEO Meta Tags -->
+  <title>Pricing - StudioSix | Simple, Transparent Pricing for Professional Product Photos</title>
+  <meta name="description" content="Choose the perfect plan for your business. Free, Basic ($9/mo), or Pro ($19/mo). Professional product photography with no contracts." />
+  <meta name="keywords" content="product photography pricing, AI photo editing cost, affordable product photos, photography subscription" />
+  
+  <!-- Schema.org Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "StudioSix",
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Free",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      {
+        "@type": "Offer",
+        "name": "Basic",
+        "price": "9",
+        "priceCurrency": "USD"
+      },
+      {
+        "@type": "Offer",
+        "name": "Pro",
+        "price": "19",
+        "priceCurrency": "USD"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Inter font & Bootstrap -->
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+  <style>
+    :root {
+      --bg-light: #f7f7fb;
+      --text-light: #000;
+      --chatgpt-blue: #0a7cff;
+      --header-height: 3rem;
+    }
+
+    body {
+      background-color: var(--bg-light);
+      font-family: 'Inter', sans-serif;
+      color: var(--text-light);
+      padding-top: calc(1.5rem + var(--header-height));
+    }
+
+    /* Site header and navigation */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-light);
+      padding: 1.5rem 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .site-logo {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+    }
+
+    .site-nav {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .site-nav a {
+      color: #666;
+      text-decoration: none;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .site-nav a:hover,
+    .site-nav a.active {
+      color: #333;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #333;
+      cursor: pointer;
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-left: 1.5rem;
+    }
+
+    .btn-login {
+      padding: 0.5rem 1.25rem;
+      background: white;
+      color: #333;
+      border: none;
+      border-radius: 0.375rem;
+      text-decoration: none;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-login:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+      color: #333;
+    }
+
+    .btn-signup {
+      padding: 0.5rem 1.25rem;
+      background: #333;
+      color: white !important;
+      border: none;
+      border-radius: 0.375rem;
+      text-decoration: none;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-signup:hover {
+      background: #1a1a1a;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+      color: white !important;
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: #333;
+    }
+
+    .hero p {
+      font-size: 1rem;
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    /* Billing Toggle */
+    .billing-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    .toggle-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #666;
+    }
+
+    .toggle-label.active {
+      color: #333;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 56px;
+      height: 28px;
+      background: #ddd;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .toggle-switch.active {
+      background: var(--chatgpt-blue);
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 24px;
+      height: 24px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s ease;
+    }
+
+    .toggle-switch.active::after {
+      transform: translateX(28px);
+    }
+
+    .annual-badge {
+      background: #e8f5e9;
+      color: #2e7d32;
+      padding: 0.25rem 0.625rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .plan-credits {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Pricing Cards */
+    .pricing-container {
+      max-width: 1200px;
+      margin: 0 auto 4rem;
+      padding: 0 1rem;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      align-items: stretch;
+    }
+
+    .pricing-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem 1.75rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+    }
+
+    .pricing-card.featured {
+      border: 2px solid var(--chatgpt-blue);
+    }
+
+    .featured-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--chatgpt-blue);
+      color: white;
+      padding: 0.375rem 1rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .plan-name {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    .plan-description {
+      color: #666;
+      font-size: 0.9375rem;
+      margin-bottom: 1.5rem;
+      min-height: 3rem;
+    }
+
+    .plan-price {
+      margin-bottom: 1.5rem;
+    }
+
+    .price-amount {
+      font-size: 3rem;
+      font-weight: 700;
+      color: #333;
+      line-height: 1;
+    }
+
+    .price-period {
+      color: #666;
+      font-size: 1rem;
+    }
+
+    .original-price {
+      text-decoration: line-through;
+      color: #999;
+      font-size: 1.25rem;
+      margin-right: 0.5rem;
+    }
+
+    .plan-exports {
+      background: var(--bg-light);
+      padding: 1rem;
+      border-radius: 0.5rem;
+      text-align: center;
+      margin-bottom: 2rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .plan-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 2rem 0;
+      flex-grow: 1;
+    }
+
+    .plan-features li {
+      padding: 0.75rem 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      color: #666;
+      font-size: 0.9375rem;
+    }
+
+    .plan-features li i {
+      color: var(--chatgpt-blue);
+      font-size: 1.125rem;
+      flex-shrink: 0;
+      margin-top: 0.125rem;
+    }
+
+    .plan-cta {
+      display: block;
+      width: 100%;
+      padding: 1rem;
+      background: var(--chatgpt-blue);
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      transition: background 0.3s ease;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .plan-cta:hover {
+      background: #0968d9;
+      color: white;
+    }
+
+    .plan-cta.secondary {
+      background: transparent;
+      color: var(--chatgpt-blue);
+      border: 2px solid var(--chatgpt-blue);
+    }
+
+    .plan-cta.secondary:hover {
+      background: var(--bg-light);
+    }
+
+    /* FAQ Section */
+    .faq-section {
+      max-width: 800px;
+      margin: 4rem auto;
+      padding: 0 1rem;
+    }
+
+    .faq-title {
+      text-align: center;
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      color: #333;
+    }
+
+    .faq-item {
+      background: white;
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .faq-item h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 0.625rem;
+    }
+
+    .faq-item p {
+      color: #666;
+      margin: 0;
+      line-height: 1.6;
+      font-size: 0.875rem;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .site-nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 5%;
+        background: white;
+        flex-direction: column;
+        gap: 0;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin-top: 0.5rem;
+        min-width: 200px;
+      }
+      .site-nav.show {
+        display: flex;
+      }
+      .site-nav a {
+        padding: 0.5rem;
+      }
+      .auth-buttons {
+        flex-direction: row;
+        width: auto;
+        margin-left: 0;
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid #eee;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+      .btn-login,
+      .btn-signup {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+      .mobile-menu-btn {
+        display: block;
+      }
+      .hero h1 {
+        font-size: 1.75rem;
+      }
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+      .price-amount {
+        font-size: 2.25rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Site Header with Navigation -->
+  <header class="site-header">
+    <a href="{{ url_for('index') }}" class="site-logo">StudioSix</a>
+    <nav class="site-nav" id="siteNav">
+      <a href="{{ url_for('index') }}">Product</a>
+      <a href="{{ url_for('resources') }}">Resources</a>
+      <a href="{{ url_for('pricing') }}" class="active">Pricing</a>
+      <div class="auth-buttons">
+        <a href="{{ url_for('login') }}" class="btn-login">Log in</a>
+        <a href="{{ url_for('signup') }}" class="btn-signup">Sign up</a>
+      </div>
+    </nav>
+    <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">☰</button>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <h1>Simple, Transparent Pricing</h1>
+      <p>Choose the perfect plan for your business. No hidden fees, cancel anytime.</p>
+      
+      <!-- Billing Toggle -->
+      <div class="billing-toggle">
+        <span class="toggle-label" id="monthlyLabel">Monthly</span>
+        <div class="toggle-switch" id="billingToggle" onclick="toggleBilling()"></div>
+        <span class="toggle-label" id="annualLabel">
+          Annual <span class="annual-badge">2 months free</span>
+        </span>
+      </div>
+    </section>
+
+    <!-- Pricing Cards -->
+    <section class="pricing-container">
+      <div class="pricing-grid">
+        
+        <!-- Free Plan -->
+        <article class="pricing-card">
+          <h2 class="plan-name">Free</h2>
+          <p class="plan-description">Perfect for trying out StudioSix</p>
+          <div class="plan-credits">12,500 credits/month</div>
+          <div class="plan-price">
+            <div class="price-amount">$0</div>
+            <div class="price-period">forever</div>
+          </div>
+          <div class="plan-cta-wrapper">
+            <a href="{{ url_for('signup') }}" class="plan-cta secondary">Get Started</a>
+          </div>
+          <ul class="plan-features">
+            <li><i class="bi bi-check-circle-fill"></i> White background only</li>
+            <li><i class="bi bi-check-circle-fill"></i> Basic image processing</li>
+            <li><i class="bi bi-check-circle-fill"></i> Standard resolution</li>
+            <li><i class="bi bi-check-circle-fill"></i> Community support</li>
+            <li><i class="bi bi-check-circle-fill"></i> 50 images per month</li>
+          </ul>
+        </article>
+
+        <!-- Basic Plan -->
+        <article class="pricing-card featured">
+          <div class="featured-badge">Most Popular</div>
+          <h2 class="plan-name">Basic</h2>
+          <p class="plan-description">For growing businesses and small teams</p>
+          <div class="plan-credits">62,500 credits/month</div>
+          <div class="plan-price">
+            <span class="original-price annual-price" style="display: none;">was $108/year</span>
+            <div>
+              <span class="price-amount monthly-price">$9</span>
+              <span class="price-amount annual-price" style="display: none;">$7.50</span>
+            </div>
+            <span class="price-period monthly-price">/month</span>
+            <span class="price-period annual-price" style="display: none;">/month, billed annually at $90/year</span>
+          </div>
+          <div class="plan-cta-wrapper">
+            <a href="{{ url_for('upgrade') }}" class="plan-cta">Get Started</a>
+          </div>
+          <ul class="plan-features">
+            <li><i class="bi bi-check-circle-fill"></i> All background styles</li>
+            <li><i class="bi bi-check-circle-fill"></i> No watermarks</li>
+            <li><i class="bi bi-check-circle-fill"></i> High resolution exports</li>
+            <li><i class="bi bi-check-circle-fill"></i> Priority processing</li>
+            <li><i class="bi bi-check-circle-fill"></i> Email support</li>
+            <li><i class="bi bi-check-circle-fill"></i> Commercial license</li>
+            <li><i class="bi bi-check-circle-fill"></i> 250 images per month</li>
+          </ul>
+        </article>
+
+        <!-- Pro Plan -->
+        <article class="pricing-card">
+          <h2 class="plan-name">Pro</h2>
+          <p class="plan-description">For professionals and agencies</p>
+          <div class="plan-credits">200,000 credits/month</div>
+          <div class="plan-price">
+            <span class="original-price annual-price" style="display: none;">was $228/year</span>
+            <div>
+              <span class="price-amount monthly-price">$19</span>
+              <span class="price-amount annual-price" style="display: none;">$15.83</span>
+            </div>
+            <span class="price-period monthly-price">/month</span>
+            <span class="price-period annual-price" style="display: none;">/month, billed annually at $190/year</span>
+          </div>
+          <div class="plan-cta-wrapper">
+            <a href="{{ url_for('upgrade') }}" class="plan-cta secondary">Get Started</a>
+          </div>
+          <ul class="plan-features">
+            <li><i class="bi bi-check-circle-fill"></i> Everything in Basic</li>
+            <li><i class="bi bi-check-circle-fill"></i> API access</li>
+            <li><i class="bi bi-check-circle-fill"></i> Batch processing</li>
+            <li><i class="bi bi-check-circle-fill"></i> Custom backgrounds</li>
+            <li><i class="bi bi-check-circle-fill"></i> Priority support</li>
+            <li><i class="bi bi-check-circle-fill"></i> Advanced editing tools</li>
+            <li><i class="bi bi-check-circle-fill"></i> Team collaboration</li>
+            <li><i class="bi bi-check-circle-fill"></i> 800 images per month</li>
+          </ul>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+      <h2 class="faq-title">Frequently Asked Questions</h2>
+      
+      <div class="faq-item">
+        <h3>Can I change plans at any time?</h3>
+        <p>Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately, and we'll prorate any differences in cost.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>What happens if I exceed my monthly exports?</h3>
+        <p>You'll be notified when you're close to your limit. You can either upgrade to a higher tier or purchase additional exports as needed.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Do unused exports roll over?</h3>
+        <p>No, exports reset at the beginning of each billing cycle. We recommend choosing a plan that matches your monthly needs.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>Is there a contract or commitment?</h3>
+        <p>No contracts required. You can cancel your subscription at any time, and you'll continue to have access until the end of your billing period.</p>
+      </div>
+
+      <div class="faq-item">
+        <h3>What payment methods do you accept?</h3>
+        <p>We accept all major credit cards, debit cards, and digital payment methods through our secure payment processor, Stripe.</p>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      const nav = document.getElementById('siteNav');
+      nav.classList.toggle('show');
+    }
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+      const nav = document.getElementById('siteNav');
+      const btn = document.getElementById('mobileMenuBtn');
+      if (nav && btn && !nav.contains(e.target) && !btn.contains(e.target)) {
+        nav.classList.remove('show');
+      }
+    });
+
+    // Billing toggle functionality
+    let isAnnual = false;
+
+    function toggleBilling() {
+      isAnnual = !isAnnual;
+      const toggle = document.getElementById('billingToggle');
+      const monthlyLabel = document.getElementById('monthlyLabel');
+      const annualLabel = document.getElementById('annualLabel');
+      
+      const monthlyPrices = document.querySelectorAll('.monthly-price');
+      const annualPrices = document.querySelectorAll('.annual-price');
+      
+      if (isAnnual) {
+        toggle.classList.add('active');
+        monthlyLabel.classList.remove('active');
+        annualLabel.classList.add('active');
+        monthlyPrices.forEach(el => el.style.display = 'none');
+        annualPrices.forEach(el => el.style.display = 'inline');
+      } else {
+        toggle.classList.remove('active');
+        monthlyLabel.classList.add('active');
+        annualLabel.classList.remove('active');
+        monthlyPrices.forEach(el => el.style.display = 'inline');
+        annualPrices.forEach(el => el.style.display = 'none');
+      }
+    }
+
+    // Set initial state
+    document.getElementById('monthlyLabel').classList.add('active');
+  </script>
+</body>
+</html>

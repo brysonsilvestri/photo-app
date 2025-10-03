@@ -1,0 +1,9 @@
+flask
+python-dotenv
+google-genai
+flask-login
+flask-sqlalchemy
+email-validator
+stripe
+qrcode
+pillow
