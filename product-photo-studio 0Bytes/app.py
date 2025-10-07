@@ -6,7 +6,7 @@ from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file
 from flask_login import (
     LoginManager, UserMixin, login_user, logout_user,
-    current_user
+    current_user, login_required
 )
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
@@ -88,7 +88,6 @@ class Generation(db.Model):
     input_image_path = db.Column(db.String(255), nullable=False)
     output_image_path = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    prompt_style = db.Column(db.String(100), default='white')  # Stores which style was used
 
 # --- Mobile upload token model (QR flow) ---
 class MobileUploadToken(db.Model):
@@ -104,18 +103,14 @@ class MobileUploadToken(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# --- Style-specific prompts ---
-STYLE_PROMPTS = {
-    'white': """Using the provided image, identify the product in the photo and isolate it from all other objects
+# --- Single white background prompt ---
+WHITE_BACKGROUND_PROMPT = """Using the provided image, identify the product in the photo and isolate it from all other objects
 around it. Place it on a white studio background with soft professional lighting. The product should be shot on a 50 mm lens and face directly 
-towards the lens. If and only when the product is a shoe, the product can be placed sideways with the lens.""",
-    
-    'studio': """Using the provided image, identify the product in the photo and isolate it from all other objects
-around it. Place it on a professional studio background with gradient lighting from light gray to white. Add subtle shadows beneath the product
-for depth. The product should be shot on a 50mm lens with professional studio lighting that highlights the product features.""",
-    
-    'realestate': """Stage this empty living room with a cohesive set of modern, minimalist furniture—low-profile sofa, area rug, coffee table, 1–2 accent chairs, and a slender floor lamp—scaled to the room and leaving clear walkways. Fill the room with an appropriate amount of furiture, do not leave odd empty space on the edges. Preserve the existing architecture, perspective, and daylight direction, and render materials (linen/bouclé, oak/walnut, stone, matte metal) with physically correct contact shadows, subtle reflections, and fine texture for a hyper-photorealistic editorial look. Use a warm-neutral palette with one muted accent color and avoid text, logos, clutter, distortions, or floating objects."""
-}
+towards the lens. If and only when the product is a shoe, the product can be placed sideways with the lens."""
+
+## Original Prompt: Using the provided image, identify the product in the photo and isolate it from all other objects around it. Place it on a white studio background with soft professional lighting. The product should be shot on a 50 mm lens and face directly towards the lens. If and only when the product is a shoe, the product can be placed sideways with the lens. ##
+
+## Prompt 2 potential AB test (MAKEUP - more dramatic shadows) "Identify the single primary product in the uploaded photo, disregard and remove all other objects and the original background, and place the product on a pure white seamless studio backdrop. Light it dramatically with a directional key and a subtle rim light to create crisp yet realistic contrast, maintaining accurate color, fine surface texture, and a natural contact shadow (with a faint floor reflection if appropriate). Compose as a straight-on 50 mm–equivalent shot at eye level; preserve true proportions and label legibility, add nothing (no props/text/watermarks), eliminate artifacts or halos, and deliver a hyper-photorealistic, high-resolution result." ##
 
 # --- Stripe helpers ---
 def ensure_stripe_customer(user: User):
@@ -245,6 +240,15 @@ def logout():
     return redirect(url_for('index'))
 
 # -----------------------
+# Account Page
+# -----------------------
+@app.route("/account")
+@login_required
+def account():
+    """Account dashboard showing plan, credits, and usage"""
+    return render_template("account.html", user=current_user)
+
+# -----------------------
 # Billing
 # -----------------------
 @app.route("/upgrade")
@@ -317,13 +321,12 @@ def post_checkout():
         return redirect(url_for('index'))
 
 @app.route("/billing-portal")
+@login_required
 def billing_portal():
-    if not current_user.is_authenticated:
-        return redirect(url_for('login', next=url_for('billing_portal')))
     customer_id = ensure_stripe_customer(current_user)
     session = stripe.billing_portal.Session.create(
         customer=customer_id,
-        return_url=f"{APP_BASE_URL}/",
+        return_url=f"{APP_BASE_URL}/account",
     )
     return redirect(session.url, code=303)
 
@@ -444,7 +447,7 @@ def transform():
     if not current_user.is_authenticated:
         return redirect(url_for('signup', next=url_for('index')))
 
-    # 2) PAYWALL: Check credits instead of generation_count
+    # 2) PAYWALL: Check credits
     if current_user.credits_remaining < CREDITS_PER_IMAGE:
         if current_user.is_subscribed:
             flash("You've used all your monthly credits. They'll reset at the start of next month.", "info")
@@ -460,13 +463,6 @@ def transform():
     if not file or not file.filename:
         flash("Please choose an image to upload.", "error")
         return redirect(url_for('index'))
-    
-    # Get the selected style (default to 'white' if not provided)
-    style = request.form.get("style", "white")
-    if style not in STYLE_PROMPTS:
-        style = "white"
-    
-    selected_prompt = STYLE_PROMPTS[style]
 
     try:
         # Save uploaded image
@@ -492,10 +488,10 @@ def transform():
             img = img.resize((new_w, new_h), Image.LANCZOS)
             # ------------------------------------------------------------------
 
-            # Use Google Generative AI to transform the image with selected style prompt
+            # Use Google Generative AI to transform the image with white background
             response = client.models.generate_content(
                 model="gemini-2.5-flash-image-preview",
-                contents=[img, selected_prompt],
+                contents=[img, WHITE_BACKGROUND_PROMPT],
             )
             
             # Extract the generated image from response
@@ -512,17 +508,16 @@ def transform():
             generated_image = Image.open(BytesIO(image_parts[0]))
             base_name, _ = os.path.splitext(filename)
             safe_base = secure_filename(base_name) or "output"
-            output_filename = f"genai_{style}_{safe_base}.png"
+            output_filename = f"genai_white_{safe_base}.png"
             output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
             generated_image.save(output_path, format="PNG")
             output_image = "/" + output_path.replace("\\", "/")
 
-        # Save generation to database with style information
+        # Save generation to database
         generation = Generation(
             user_id=current_user.id,
             input_image_path=input_image,
             output_image_path=output_image,
-            prompt_style=style  # Store which style was used
         )
         db.session.add(generation)
         

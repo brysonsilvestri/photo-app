@@ -259,7 +259,7 @@
     .pricing-card {
       background: white;
       border-radius: 1rem;
-      padding: 2rem 1.75rem;
+      padding: 2.5rem 2rem;
       box-shadow: 0 4px 16px rgba(0,0,0,0.06);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       position: relative;
@@ -344,6 +344,7 @@
       padding: 0;
       margin: 0 0 2rem 0;
       flex-grow: 1;
+      min-height: 220px;
     }
 
     .plan-features li {
@@ -479,6 +480,9 @@
       .price-amount {
         font-size: 2.25rem;
       }
+      .plan-features {
+        min-height: auto;
+      }
     }
   </style>
 </head>
@@ -532,11 +536,10 @@
             <a href="{{ url_for('signup') }}" class="plan-cta secondary">Get Started</a>
           </div>
           <ul class="plan-features">
-            <li><i class="bi bi-check-circle-fill"></i> White background only</li>
-            <li><i class="bi bi-check-circle-fill"></i> Basic image processing</li>
-            <li><i class="bi bi-check-circle-fill"></i> Standard resolution</li>
-            <li><i class="bi bi-check-circle-fill"></i> Community support</li>
             <li><i class="bi bi-check-circle-fill"></i> 50 images per month</li>
+            <li><i class="bi bi-check-circle-fill"></i> White background removal</li>
+            <li><i class="bi bi-check-circle-fill"></i> High quality exports</li>
+            <li><i class="bi bi-check-circle-fill"></i> Commercial license</li>
           </ul>
         </article>
 
@@ -544,7 +547,7 @@
         <article class="pricing-card featured">
           <div class="featured-badge">Most Popular</div>
           <h2 class="plan-name">Basic</h2>
-          <p class="plan-description">For growing businesses and small teams</p>
+          <p class="plan-description">For growing businesses</p>
           <div class="plan-credits">62,500 credits/month</div>
           <div class="plan-price">
             <span class="original-price annual-price" style="display: none;">was $108/year</span>
@@ -559,20 +562,18 @@
             <a href="{{ url_for('upgrade') }}" class="plan-cta">Get Started</a>
           </div>
           <ul class="plan-features">
-            <li><i class="bi bi-check-circle-fill"></i> All background styles</li>
-            <li><i class="bi bi-check-circle-fill"></i> No watermarks</li>
-            <li><i class="bi bi-check-circle-fill"></i> High resolution exports</li>
-            <li><i class="bi bi-check-circle-fill"></i> Priority processing</li>
-            <li><i class="bi bi-check-circle-fill"></i> Email support</li>
-            <li><i class="bi bi-check-circle-fill"></i> Commercial license</li>
             <li><i class="bi bi-check-circle-fill"></i> 250 images per month</li>
+            <li><i class="bi bi-check-circle-fill"></i> White background removal</li>
+            <li><i class="bi bi-check-circle-fill"></i> High quality exports</li>
+            <li><i class="bi bi-check-circle-fill"></i> Priority processing</li>
+            <li><i class="bi bi-check-circle-fill"></i> Commercial license</li>
           </ul>
         </article>
 
         <!-- Pro Plan -->
         <article class="pricing-card">
           <h2 class="plan-name">Pro</h2>
-          <p class="plan-description">For professionals and agencies</p>
+          <p class="plan-description">For high-volume sellers</p>
           <div class="plan-credits">200,000 credits/month</div>
           <div class="plan-price">
             <span class="original-price annual-price" style="display: none;">was $228/year</span>
@@ -587,14 +588,11 @@
             <a href="{{ url_for('upgrade') }}" class="plan-cta secondary">Get Started</a>
           </div>
           <ul class="plan-features">
-            <li><i class="bi bi-check-circle-fill"></i> Everything in Basic</li>
-            <li><i class="bi bi-check-circle-fill"></i> API access</li>
-            <li><i class="bi bi-check-circle-fill"></i> Batch processing</li>
-            <li><i class="bi bi-check-circle-fill"></i> Custom backgrounds</li>
-            <li><i class="bi bi-check-circle-fill"></i> Priority support</li>
-            <li><i class="bi bi-check-circle-fill"></i> Advanced editing tools</li>
-            <li><i class="bi bi-check-circle-fill"></i> Team collaboration</li>
             <li><i class="bi bi-check-circle-fill"></i> 800 images per month</li>
+            <li><i class="bi bi-check-circle-fill"></i> White background removal</li>
+            <li><i class="bi bi-check-circle-fill"></i> High quality exports</li>
+            <li><i class="bi bi-check-circle-fill"></i> Priority processing</li>
+            <li><i class="bi bi-check-circle-fill"></i> Commercial license</li>
           </ul>
         </article>
 
@@ -611,13 +609,13 @@
       </div>
 
       <div class="faq-item">
-        <h3>What happens if I exceed my monthly exports?</h3>
-        <p>You'll be notified when you're close to your limit. You can either upgrade to a higher tier or purchase additional exports as needed.</p>
+        <h3>What happens if I exceed my monthly images?</h3>
+        <p>You'll be notified when you're close to your limit. You can either upgrade to a higher tier or wait until your credits reset at the start of the next month.</p>
       </div>
 
       <div class="faq-item">
-        <h3>Do unused exports roll over?</h3>
-        <p>No, exports reset at the beginning of each billing cycle. We recommend choosing a plan that matches your monthly needs.</p>
+        <h3>Do unused images roll over?</h3>
+        <p>No, your monthly allocation resets at the beginning of each billing cycle. We recommend choosing a plan that matches your monthly needs.</p>
       </div>
 
       <div class="faq-item">
