@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sign Up - StudioSix</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://rsms.me" />
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #111217;
+      --muted: #5a6678;
+      --brand: #1967ff;
+      --brand-press: #0f55da;
+      --border: #e5e7eb;
+      --bg-soft: #f9fafb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-soft);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .signup-card {
+      background: var(--bg);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      max-width: 900px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      overflow: hidden;
+    }
+
+    /* Left Side - Plan Summary */
+    .plan-summary {
+      background: var(--bg-soft);
+      padding: 2.5rem 2rem;
+      border-right: 1px solid var(--border);
+    }
+
+    .plan-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .plan-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin: 0 0 0.5rem 0;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .plan-price {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--text);
+      margin: 0;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+
+    .plan-price-period {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-left: 0.25rem;
+    }
+
+    .plan-price-note {
+      font-size: 0.875rem;
+      color: var(--muted);
+      margin: 0.5rem 0 1.5rem 0;
+    }
+
+    .plan-price-original {
+      font-size: 1.125rem;
+      text-decoration: line-through;
+      color: var(--muted);
+      margin-right: 0.5rem;
+    }
+
+    .plan-features {
+      list-style: none;
+      padding: 0;
+      margin: 1.5rem 0 0 0;
+    }
+
+    .plan-features li {
+      padding: 0.5rem 0;
+      font-size: 0.875rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .plan-features li::before {
+      content: '✓';
+      color: var(--brand);
+      font-weight: 800;
+      font-size: 1rem;
+    }
+
+    .discount-note {
+      margin-top: 1.5rem;
+      padding: 0.75rem;
+      background: #fef3c7;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #92400e;
+      text-align: center;
+    }
+
+    /* Right Side - Form */
+    .form-section {
+      padding: 2.5rem 2rem;
+    }
+
+    .form-header {
+      margin-bottom: 2rem;
+    }
+
+    .form-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin: 0 0 0.5rem 0;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .form-subtitle {
+      font-size: 0.875rem;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* Error Message */
+    .error-message {
+      margin-bottom: 1.5rem;
+      padding: 0.75rem 1rem;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      color: #dc2626;
+      font-size: 0.875rem;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    /* Form Inputs */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 48px;
+      padding: 0 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(25, 103, 255, 0.1);
+    }
+
+    .form-input.error {
+      border-color: #dc2626;
+    }
+
+    .form-input::placeholder {
+      color: #9ca3af;
+    }
+
+    /* Submit Button - Matches Landing Page */
+    .submit-button {
+      width: 100%;
+      height: 48px;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.06s ease, background 0.06s ease, box-shadow 0.2s ease;
+      box-shadow: 0 8px 20px rgba(25, 103, 255, 0.16);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .submit-button:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    .submit-button:active:not(:disabled) {
+      transform: translateY(0);
+      background: var(--brand-press);
+    }
+
+    .submit-button:disabled {
+      background: #cbd5e0;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .submit-button.loading {
+      pointer-events: none;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: none;
+    }
+
+    .submit-button.loading .spinner {
+      display: block;
+    }
+
+    .submit-button.loading .button-text {
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Form Footer */
+    .form-footer {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .form-footer-text {
+      font-size: 0.875rem;
+      color: var(--muted);
+      margin: 0 0 0.75rem 0;
+    }
+
+    .form-footer-link {
+      color: var(--brand);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.15s ease;
+    }
+
+    .form-footer-link:hover {
+      color: var(--brand-press);
+    }
+
+    .back-link {
+      display: block;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.15s ease;
+    }
+
+    .back-link:hover {
+      color: var(--text);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+        align-items: flex-start;
+      }
+
+      .signup-card {
+        grid-template-columns: 1fr;
+        margin-top: 2rem;
+      }
+
+      .plan-summary {
+        padding: 2rem 1.5rem;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .form-section {
+        padding: 2rem 1.5rem;
+      }
+
+      .plan-price {
+        font-size: 2rem;
+      }
+
+      .form-title {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="signup-card">
+    <!-- Left Side - Plan Summary -->
+    <div class="plan-summary">
+      <div class="plan-badge">SELECTED PLAN</div>
+      
+      {% if plan == 'free' %}
+        <h2 class="plan-name">Free</h2>
+        <div class="plan-price">$0<span class="plan-price-period">/month</span></div>
+        <p class="plan-price-note">No credit card required</p>
+        <ul class="plan-features">
+          <li>15 images per month</li>
+          <li>White background removal</li>
+          <li>High quality exports</li>
+        </ul>
+      {% elif plan == 'starter' %}
+        <h2 class="plan-name">Starter</h2>
+        <div class="plan-price">
+          {% if billing == 'annual' %}
+            $5<span class="plan-price-period">/month</span>
+          {% else %}
+            $6<span class="plan-price-period">/month</span>
+          {% endif %}
+        </div>
+        <p class="plan-price-note">
+          {% if billing == 'annual' %}Billed annually at $60{% else %}Billed monthly{% endif %}
+        </p>
+        <ul class="plan-features">
+          <li>120 images per month</li>
+          <li>White background removal</li>
+          <li>High quality exports</li>
+          <li>Priority processing</li>
+        </ul>
+        {% if billing == 'annual' %}
+          <div class="discount-note">Save $12 per year</div>
+        {% endif %}
+      {% elif plan == 'creator' %}
+        <h2 class="plan-name">Creator</h2>
+        <div class="plan-price">
+          {% if billing == 'annual' %}
+            $18.33<span class="plan-price-period">/month</span>
+          {% else %}
+            <span class="plan-price-original">$22</span>$11<span class="plan-price-period">/month</span>
+          {% endif %}
+        </div>
+        <p class="plan-price-note">
+          {% if billing == 'annual' %}Billed annually at $220{% else %}First month, then $22/month{% endif %}
+        </p>
+        <ul class="plan-features">
+          <li>400 images per month</li>
+          <li>White background removal</li>
+          <li>High quality exports</li>
+          <li>Priority processing</li>
+        </ul>
+        {% if billing == 'monthly' %}
+          <div class="discount-note">50% off first month</div>
+        {% else %}
+          <div class="discount-note">Save $44 per year</div>
+        {% endif %}
+      {% elif plan == 'enterprise' %}
+        <h2 class="plan-name">Enterprise</h2>
+        <div class="plan-price">
+          {% if billing == 'annual' %}
+            $82.50<span class="plan-price-period">/month</span>
+          {% else %}
+            $99<span class="plan-price-period">/month</span>
+          {% endif %}
+        </div>
+        <p class="plan-price-note">
+          {% if billing == 'annual' %}Billed annually at $990{% else %}Billed monthly{% endif %}
+        </p>
+        <ul class="plan-features">
+          <li>1,600 images per month</li>
+          <li>White background removal</li>
+          <li>High quality exports</li>
+          <li>Priority processing</li>
+        </ul>
+        {% if billing == 'annual' %}
+          <div class="discount-note">Save $198 per year</div>
+        {% endif %}
+      {% endif %}
+    </div>
+
+    <!-- Right Side - Form -->
+    <div class="form-section">
+      <div class="form-header">
+        <h1 class="form-title">Create your account</h1>
+        <p class="form-subtitle">Start generating professional product photos</p>
+      </div>
+
+      <!-- Error Message -->
+      <div id="errorMessage" class="error-message"></div>
+
+      <!-- Form -->
+      <form id="signupForm" novalidate>
+        <input type="hidden" id="plan" value="{{ plan }}">
+        <input type="hidden" id="billing" value="{{ billing }}">
+
+        <div class="form-group">
+          <label for="email" class="form-label">Email</label>
+          <input 
+            type="email" 
+            id="email" 
+            class="form-input" 
+            placeholder="you@example.com"
+            required
+            autocomplete="email"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            class="form-input" 
+            placeholder="At least 8 characters"
+            required
+            autocomplete="new-password"
+            minlength="8"
+          >
+        </div>
+
+        <button type="submit" id="submitBtn" class="submit-button">
+          <span class="button-text">Create Account</span>
+          <span class="spinner"></span>
+        </button>
+      </form>
+
+      <div class="form-footer">
+        <p class="form-footer-text">
+          Already have an account? 
+          <a href="{{ url_for('login') }}" class="form-footer-link">Log in</a>
+        </p>
+        <a href="{{ url_for('pricing') }}" class="back-link">← Back to Pricing</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('signupForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const plan = document.getElementById('plan').value;
+    const billing = document.getElementById('billing').value;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      
+      emailInput.classList.remove('error');
+      passwordInput.classList.remove('error');
+      errorMessage.classList.remove('show');
+      errorMessage.textContent = '';
+      
+      if (!email || !email.includes('@')) {
+        emailInput.classList.add('error');
+        errorMessage.textContent = 'Please enter a valid email address';
+        errorMessage.classList.add('show');
+        return;
+      }
+      
+      if (password.length < 8) {
+        passwordInput.classList.add('error');
+        errorMessage.textContent = 'Password must be at least 8 characters';
+        errorMessage.classList.add('show');
+        return;
+      }
+      
+      submitBtn.disabled = true;
+      submitBtn.classList.add('loading');
+      
+      try {
+        const response = await fetch('/api/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            password: password,
+            plan: plan,
+            billing: billing
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          if (data.checkout_url) {
+            window.location.href = data.checkout_url;
+          } else if (data.redirect) {
+            window.location.href = data.redirect;
+          }
+        } else {
+          errorMessage.textContent = data.error || 'Something went wrong. Please try again.';
+          errorMessage.classList.add('show');
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('loading');
+          
+          if (data.error && data.error.toLowerCase().includes('email')) {
+            emailInput.classList.add('error');
+          }
+        }
+      } catch (error) {
+        errorMessage.textContent = 'Connection error. Please try again.';
+        errorMessage.classList.add('show');
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('loading');
+      }
+    });
+
+    emailInput.addEventListener('input', () => {
+      emailInput.classList.remove('error');
+    });
+
+    passwordInput.addEventListener('input', () => {
+      passwordInput.classList.remove('error');
+    });
+  </script>
+</body>
+</html>

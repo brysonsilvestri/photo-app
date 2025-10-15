@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Product Photo Studio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Inter font & Bootstrap -->
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-light: #f7f7fb;
+      --text-light: #000;
+      --box-light: #f2f2f2;
+      --border-light: #ccc;
+      --chatgpt-blue: #0a7cff;
+      --sidebar-bg: #ffffff;
+      --sidebar-hover: #f8f9fa;
+      --module-spacing: 1.5rem;
+      --header-height: 3rem;
+    }
+
+    body {
+      background-color: var(--bg-light);
+      font-family: 'Inter', sans-serif;
+      color: var(--text-light);
+      overflow-x: hidden;
+      padding: var(--module-spacing);
+      padding-top: calc(var(--module-spacing) * 2 + var(--header-height));
+      position: relative;
+    }
+
+    /* Site header and navigation */
+    .site-header {
+      position: absolute;
+      top: var(--module-spacing);
+      left: 5%;
+      right: 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .site-logo {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+      letter-spacing: -0.02em;
+    }
+
+    .site-nav {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .site-nav a {
+      color: #666;
+      text-decoration: none;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .site-nav a:hover {
+      color: #333;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #333;
+      cursor: pointer;
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-left: 1.5rem;
+    }
+
+    .btn-login {
+      padding: 0.5rem 1.25rem;
+      background: white;
+      color: #333;
+      border: none;
+      border-radius: 0.375rem;
+      text-decoration: none;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-login:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+      color: #333;
+    }
+
+    .btn-signup {
+      padding: 0.5rem 1.25rem;
+      background: #333;
+      color: white !important;
+      border: none;
+      border-radius: 0.375rem;
+      text-decoration: none;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-signup:hover {
+      background: #1a1a1a;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+      color: white !important;
+    }
+
+    /* Account dropdown menu */
+    .account-dropdown {
+      position: relative;
+    }
+
+    .account-btn {
+      padding: 0.5rem 1.25rem;
+      background: white;
+      color: #333;
+      border: none;
+      border-radius: 0.375rem;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .account-btn:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .account-menu {
+      position: absolute;
+      top: calc(100% + 0.5rem);
+      right: 0;
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      min-width: 180px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.2s ease;
+      z-index: 1000;
+    }
+
+    .account-dropdown.show .account-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .account-menu a {
+      display: block;
+      padding: 0.75rem 1.25rem;
+      color: #333;
+      text-decoration: none;
+      font-size: 0.9375rem;
+      transition: background-color 0.2s ease;
+    }
+
+    .account-menu a:first-child {
+      border-radius: 0.5rem 0.5rem 0 0;
+    }
+
+    .account-menu a:last-child {
+      border-radius: 0 0 0.5rem 0.5rem;
+    }
+
+    .account-menu a:hover {
+      background-color: var(--bg-light);
+    }
+
+    /* Modular layout */
+    .main-container {
+      display: flex;
+      gap: var(--module-spacing);
+      max-width: 1400px;
+      margin: 0 auto;
+      height: calc(100vh - 4.5rem - var(--header-height));
+      align-items: stretch;
+    }
+    
+    /* No sidebar layout when not authenticated */
+    .main-container.no-sidebar {
+      justify-content: center;
+    }
+    
+    .main-container.no-sidebar .main-content {
+      max-width: 900px;
+    }
+
+    /* Sidebar module for generation history */
+    .generation-sidebar {
+      width: 320px;
+      background: var(--sidebar-bg);
+      border-radius: 1rem;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .generation-sidebar.collapsed {
+      width: 60px;
+    }
+
+    .generation-sidebar.collapsed .sidebar-content {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .generation-sidebar.collapsed .sidebar-header {
+      padding: 1rem 0;
+      justify-content: center;
+    }
+
+    .generation-sidebar.collapsed .sidebar-title {
+      display: none;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #333;
+      margin: 0;
+    }
+
+    .collapse-btn {
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 0.375rem;
+      color: #666;
+      cursor: pointer;
+      padding: 0.125rem 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s ease;
+      font-size: 0.875rem;
+      line-height: 1;
+    }
+
+    .collapse-btn:hover {
+      color: var(--chatgpt-blue);
+    }
+
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem 0 1rem 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .generation-item {
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      color: inherit;
+      margin: 0 1rem 0.5rem 1rem;
+      border-radius: 0.5rem;
+    }
+
+    .generation-item:first-child {
+      margin-top: 0.5rem;
+    }
+
+    .generation-item:hover {
+      background-color: var(--sidebar-hover);
+    }
+
+    .generation-item.active {
+      background-color: #e8f0ff;
+      position: relative;
+    }
+
+    .generation-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background-color: var(--chatgpt-blue);
+      border-radius: 0 3px 3px 0;
+    }
+
+    .generation-thumb {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 0.375rem;
+      border: 1px solid #e5e5e5;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .generation-item:hover .generation-thumb {
+      border-color: var(--chatgpt-blue);
+    }
+
+    .generation-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .generation-date {
+      font-size: 0.75rem;
+      color: #999;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .generation-time {
+      font-size: 0.8125rem;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .empty-history {
+      padding: 2rem 1.5rem;
+      text-align: center;
+      color: #999;
+      font-size: 0.875rem;
+    }
+
+    /* Hide/show elements based on collapsed state */
+    .generation-sidebar.collapsed .generation-item span,
+    .generation-sidebar.collapsed .generation-info,
+    .generation-sidebar.collapsed .empty-history,
+    .generation-sidebar.collapsed .new-generation-btn {
+      display: none;
+    }
+
+    .generation-sidebar.collapsed .generation-item {
+      justify-content: center;
+      margin: 0.5rem;
+      padding: 0.5rem;
+      position: relative;
+    }
+
+    .generation-sidebar.collapsed .generation-thumb {
+      width: 36px;
+      height: 36px;
+      transition: transform 0.2s ease;
+    }
+    
+    .generation-sidebar.collapsed .generation-item:hover .generation-thumb {
+      transform: scale(1.1);
+    }
+    
+    /* Tooltip for collapsed sidebar */
+    .generation-sidebar.collapsed .generation-item:hover::after {
+      content: attr(data-date);
+      position: absolute;
+      left: 100%;
+      margin-left: 10px;
+      background: #333;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      white-space: nowrap;
+      font-size: 0.75rem;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .new-generation-btn {
+      display: block;
+      margin: 0 1rem 0.5rem 1rem;
+      padding: 0.625rem;
+      background-color: var(--chatgpt-blue);
+      color: white;
+      text-align: center;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: background-color 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .new-generation-btn:hover {
+      background-color: #0968d9;
+      color: white;
+    }
+
+    /* Main content module */
+    .main-content {
+      flex: 1;
+      display: flex;
+      align-items: stretch;
+      overflow: hidden;
+    }
+
+    .card {
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+      animation: fadeUp 0.6s ease-out;
+      width: 100%;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px);} to { opacity: 1; transform: translateY(0);} }
+
+    h1.header {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      margin-top: 0.5rem;
+      min-height: auto;
+      white-space: nowrap;
+      overflow: hidden;
+      will-change: transform;
+      color: #333;
+      flex-shrink: 0;
+    }
+
+    .upload-box {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      aspect-ratio: 1 / 1;
+      max-height: 400px;
+      background-color: var(--box-light);
+      border-radius: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: inset 0 0 0 transparent;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .upload-box:hover { box-shadow: inset 0 0 0 2px var(--chatgpt-blue); }
+    .upload-box:hover .upload-icon, .upload-box:hover .upload-text { transform: scale(1.1); }
+    .upload-icon { font-size: 2.5rem; color: #555; transition: transform 0.2s ease; }
+    .upload-text { font-size: 0.9375rem; color: #555; margin-top: 0.25rem; transition: transform 0.2s ease; }
+
+    .preview-img, .output-img {
+      width: 100%;
+      max-width: 400px;
+      max-height: 400px;
+      margin: 0 auto;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border-light);
+      animation: fadeIn 0.4s ease;
+      display: block;
+      flex-shrink: 0;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .thumbnail-img {
+      width: 80px; 
+      height: 80px; 
+      object-fit: cover; 
+      border-radius: 0.5rem;
+      border: none;
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1); 
+      cursor: pointer;
+      position: absolute;
+      top: 0;
+      right: -90px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+    .thumbnail-img:hover { 
+      transform: scale(1.08) rotate(-2deg);
+    }
+
+    .image-wrapper { 
+      position: relative; 
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      flex-shrink: 0;
+    }
+    .remove-btn {
+      position: absolute; top: 0.5rem; right: 0.5rem; background: white; color: #333; border: none; border-radius: 50%;
+      width: 30px; height: 30px; font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 2; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .results-image-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      flex-shrink: 0;
+    }
+
+    /* Transform button styling */
+    .transform-btn-wrapper {
+      width: 100%;
+      max-width: 400px;
+      margin: 1rem auto 0;
+      display: flex;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .btn-transform {
+      width: 200px;
+      padding: 0.875rem;
+      background-color: #333;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    .btn-transform:not(:disabled) {
+      cursor: pointer;
+      opacity: 1;
+      width: 280px;
+    }
+
+    .btn-transform:not(:disabled):hover {
+      background-color: #1a1a1a;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Credit bar - small overlay in bottom left of white card */
+    .credit-bar-overlay {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 1.5rem;
+      background: rgba(247, 247, 251, 0.95);
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      backdrop-filter: blur(10px);
+      z-index: 10;
+      min-width: 140px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .credit-bar-label {
+      font-size: 0.75rem;
+      color: #666;
+      margin-bottom: 0.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .credit-count {
+      font-weight: 600;
+      color: #333;
+      font-size: 0.75rem;
+    }
+
+    .credit-bar-bg {
+      width: 100%;
+      height: 4px;
+      background: #e0e0e0;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .credit-bar-fill {
+      height: 100%;
+      background: var(--chatgpt-blue);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    /* Comparison Modal */
+    .comparison-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 10000;
+      animation: fadeInModal 0.3s ease-out;
+    }
+
+    @keyframes fadeInModal {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .comparison-modal.show {
+      display: flex;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      background: white;
+      color: #333;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10001;
+      transition: transform 0.2s ease;
+    }
+
+    .modal-close:hover {
+      transform: scale(1.1) rotate(90deg);
+    }
+
+    .comparison-content {
+      display: flex;
+      gap: 2rem;
+      padding: 2rem;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .image-half {
+      flex: 1;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .image-half h3 {
+      color: white;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .image-half img {
+      max-width: 100%;
+      max-height: 80vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 0.75rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .download-btn { 
+      background-color: var(--chatgpt-blue); 
+      color: white; 
+      border: none; 
+      transition: background-color 0.3s ease;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+      min-width: 112px;
+    }
+    .download-btn:hover { 
+      background-color: #0968d9; 
+      color: white; 
+    }
+    .new-image-btn { 
+      background-color: #606060; 
+      color: white; 
+      border: none; 
+      transition: background-color 0.3s ease;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+      min-width: 112px;
+    }
+    .new-image-btn:hover { 
+      background-color: #333333; 
+      color: white; 
+    }
+
+    .results-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .results-buttons {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      width: 100%;
+      margin-top: 1rem;
+    }
+
+    .spinner-overlay {
+      position: fixed; inset: 0; background: rgba(80, 80, 80, 0.7);
+      display: none; align-items: center; justify-content: center; z-index: 9999; flex-direction: column;
+    }
+    .loader { width: 60px; height: 60px; position: relative; }
+    .loader-circle {
+      width: 100%; height: 100%; border-radius: 50%;
+      border: 3px solid rgba(150, 150, 150, 0.2); border-top-color: #999;
+      animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    .hidden { display: none !important; }
+    .btn-icon { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
+
+    /* Content wrapper to prevent scrolling */
+    .content-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      overflow: hidden;
+      padding: 1rem 0;
+    }
+
+    .card-inner {
+      padding: 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .alert {
+      flex-shrink: 0;
+      margin-bottom: 1rem;
+    }
+
+    /* Mobile responsive adjustments */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+        padding-top: calc(2rem + var(--header-height));
+      }
+      .site-header {
+        top: 1rem;
+        left: 5%;
+        right: 5%;
+      }
+      .site-logo {
+        font-size: 1.25rem;
+      }
+      .site-nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        gap: 0;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin-top: 0.5rem;
+        min-width: 200px;
+      }
+      .site-nav.show {
+        display: flex;
+      }
+      .site-nav a {
+        padding: 0.5rem;
+      }
+      .auth-buttons {
+        flex-direction: row;
+        width: auto;
+        margin-left: 0;
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid #eee;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+      .btn-login,
+      .btn-signup {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+      .account-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+      }
+      .site-nav + .mobile-menu-btn {
+        display: block;
+      }
+      .main-container {
+        flex-direction: column;
+        gap: 1rem;
+        height: calc(100vh - 2rem - var(--header-height));
+      }
+      .generation-sidebar {
+        width: 100%;
+        max-height: 200px;
+      }
+      .generation-sidebar.collapsed {
+        max-height: 60px;
+        width: 100%;
+      }
+      .main-content {
+        padding: 0;
+      }
+      h1.header { 
+        margin-top: 0;
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+      }
+      .upload-box {
+        max-width: 100%;
+        max-height: 300px;
+      }
+      .preview-img, .output-img {
+        max-width: 100%;
+        max-height: 300px;
+      }
+      .image-wrapper {
+        max-width: 100%;
+      }
+      .results-image-wrapper {
+        max-width: 100%;
+      }
+      .transform-btn-wrapper {
+        max-width: 100%;
+      }
+      .results-container {
+        max-width: 100%;
+      }
+      .results-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .download-btn,
+      .new-image-btn {
+        min-width: 100%;
+      }
+      .thumbnail-img {
+        width: 60px;
+        height: 60px;
+        right: -70px;
+      }
+      .comparison-content {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+      }
+      .image-half img {
+        max-height: 40vh;
+      }
+      .btn-transform:not(:disabled) {
+        width: 100%;
+      }
+      .card-inner {
+        padding: 1rem;
+      }
+      .credit-bar-overlay {
+        bottom: 1rem;
+        left: 1rem;
+        min-width: 120px;
+        padding: 0.375rem 0.625rem;
+      }
+      .credit-bar-label,
+      .credit-count {
+        font-size: 0.6875rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Site Header with Navigation -->
+  <div class="site-header">
+    <div class="site-logo">StudioSix</div>
+    {% if user and user.is_authenticated %}
+    <!-- Logged in: Show account dropdown -->
+    <div class="account-dropdown" id="accountDropdown">
+      <button class="account-btn" onclick="toggleAccountMenu()">
+        <span>{{ user.email.split('@')[0] }}</span>
+        <span>▾</span>
+      </button>
+      <div class="account-menu">
+        <a href="{{ url_for('account') }}">My Account</a>
+        {% if not user.is_subscribed or (user.credits_limit and user.credits_limit < 200000) %}
+        <a href="{{ url_for('upgrade') }}">Upgrade</a>
+        {% endif %}
+        <a href="{{ url_for('logout') }}">Logout</a>
+      </div>
+    </div>
+    {% else %}
+    <!-- Not logged in: Show full navigation -->
+    <nav class="site-nav" id="siteNav">
+      <a href="{{ url_for('index') }}">Product</a>
+      <a href="{{ url_for('resources') }}">Resources</a>
+      <a href="{{ url_for('pricing') }}">Pricing</a>
+      <div class="auth-buttons">
+        <a href="{{ url_for('login') }}" class="btn-login">Log in</a>
+        <a href="{{ url_for('signup') }}" class="btn-signup">Sign up</a>
+      </div>
+    </nav>
+    <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">☰</button>
+    {% endif %}
+  </div>
+
+  <div class="main-container {% if not (user and user.is_authenticated) %}no-sidebar{% endif %}">
+    <!-- Generation History Module (Left) -->
+    {% if user and user.is_authenticated %}
+    <div class="generation-sidebar" id="sidebarModule">
+      <div class="sidebar-header">
+        <h3 class="sidebar-title">Your Photos</h3>
+        <button class="collapse-btn" onclick="toggleSidebar()">
+          <span>◀</span>
+        </button>
+      </div>
+
+      {% if user_generations %}
+        <a href="{{ url_for('index') }}" class="new-generation-btn">+ New Generation</a>
+      {% endif %}
+
+      <div class="sidebar-content">
+        {% if user_generations %}
+          {% for gen in user_generations %}
+          <a href="{{ url_for('view_generation', generation_id=gen.id) }}" 
+             class="generation-item {% if selected_generation_id == gen.id %}active{% endif %}"
+             data-date="{{ gen.created_at.strftime('%b %d, %I:%M %p') }}">
+            <img src="{{ gen.output_image_path }}" alt="Generation" class="generation-thumb">
+            <div class="generation-info">
+              <div class="generation-time">
+                {{ gen.created_at.strftime('%I:%M %p') }}
+              </div>
+              <div class="generation-date">
+                {{ gen.created_at.strftime('%b %d, %Y') }}
+              </div>
+            </div>
+          </a>
+          {% endfor %}
+        {% else %}
+          <div class="empty-history">
+            <p>No images yet</p>
+            <p style="margin-top: 0.5rem;">Upload your first product photo to get started!</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Generation Tool Module (Right) -->
+    <div class="main-content">
+      <div class="card">
+        <div class="card-inner">
+
+            <h1 class="header" id="dynamicHeader"></h1>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                {% for category, message in messages %}
+                  <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                  </div>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            {% if error %}
+              <div class="alert alert-danger" role="alert">{{ error }}</div>
+            {% endif %}
+
+            {# --- Paywall banner (client-side UX hint; server still enforces) --- #}
+            {% set blocked = (user.is_authenticated and not user.is_subscribed and (user.generation_count or 0) >= 1) if user else False %}
+            {% if blocked %}
+              <div class="alert alert-info d-flex justify-content-between align-items-center">
+                <div>You've used your free image. Upgrade to continue.</div>
+                <a class="btn btn-primary btn-sm" href="{{ url_for('upgrade') }}">Upgrade</a>
+              </div>
+            {% endif %}
+
+            <div class="content-wrapper">
+              {% if not output_image %}
+              <!-- Unified form: everyone posts here; server decides login/paywall/transform -->
+              <form id="genForm" method="POST" action="{{ url_for('transform') }}" enctype="multipart/form-data" novalidate data-blocked="{{ '1' if blocked else '0' }}" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                
+                    <div id="uploadPlaceholder" class="upload-box">
+                      <div class="upload-icon">＋</div>
+                      <div class="upload-text">Upload photo</div>
+                    </div>
+                    
+                    <div id="previewWrapper" class="image-wrapper hidden">
+                      <button type="button" id="removeBtn" class="remove-btn">&times;</button>
+                      <img id="preview" class="preview-img" src="" alt="Image Preview" />
+                    </div>
+                    
+                    <input type="file" name="image" id="image" accept="image/png,image/jpeg,image/webp" class="form-control hidden" required />
+                    
+                    <!-- Transform button below upload box -->
+                    <div class="transform-btn-wrapper">
+                      <button id="submitBtn" class="btn-transform" type="submit" disabled>
+                        {% if blocked %}Upgrade to Continue →{% else %}Transform →{% endif %}
+                      </button>
+                    </div>
+                
+              </form>
+
+              {% else %}
+              <!-- Result view -->
+              <div class="results-container">
+                <div class="results-image-wrapper">
+                  <img src="{{ output_image }}" alt="AI Generated Image" class="output-img" />
+                  
+                  {% if input_image %}
+                    <img src="{{ input_image }}" 
+                         alt="Uploaded Image Thumbnail" 
+                         class="thumbnail-img" 
+                         id="thumbnailImg"
+                         title="Click to compare" />
+                  {% endif %}
+                </div>
+                
+                <div class="results-buttons">
+                  {% if output_image %}
+                    <a class="download-btn" href="{{ output_image }}" download>Download</a>
+                  {% endif %}
+                  <a href="{{ url_for('index') }}" class="new-image-btn">New Image</a>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Credit bar overlay (only for subscribed users) - positioned in bottom left of white card -->
+            {% if user and user.is_authenticated and user.is_subscribed %}
+            <div class="credit-bar-overlay">
+              <div class="credit-bar-label">
+                <span>Credits</span>
+                <span class="credit-count">{{ (user.credits_remaining | default(0) / 1000) | int }}k</span>
+              </div>
+              <div class="credit-bar-bg">
+                <div class="credit-bar-fill" style="width: {{ ((user.credits_remaining | default(0) / user.credits_limit | default(1)) * 100) | int }}%"></div>
+              </div>
+            </div>
+            {% endif %}
+
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison Modal -->
+  <div id="comparisonModal" class="comparison-modal">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <div class="comparison-content">
+      <div class="image-half">
+        <h3>Original</h3>
+        <img id="compareOriginal" src="" alt="Original">
+      </div>
+      <div class="image-half">
+        <h3>Transformed</h3>
+        <img id="compareTransformed" src="" alt="Transformed">
+      </div>
+    </div>
+  </div>
+
+  <!-- Spinner -->
+  <div id="spinner" class="spinner-overlay">
+    <div class="loader"><div class="loader-circle"></div></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Account dropdown toggle
+    function toggleAccountMenu() {
+      const dropdown = document.getElementById('accountDropdown');
+      dropdown.classList.toggle('show');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      const dropdown = document.getElementById('accountDropdown');
+      if (dropdown && !dropdown.contains(e.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+
+    // Sidebar collapse functionality
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebarModule');
+      const arrow = document.querySelector('.collapse-btn span');
+      sidebar.classList.toggle('collapsed');
+      
+      // Change arrow direction
+      const isCollapsed = sidebar.classList.contains('collapsed');
+      arrow.textContent = isCollapsed ? '▶' : '◀';
+      
+      // Save state to localStorage
+      localStorage.setItem('sidebarCollapsed', isCollapsed);
+    }
+
+    // Restore sidebar state on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+      const arrow = document.querySelector('.collapse-btn span');
+      if (isCollapsed) {
+        document.getElementById('sidebarModule')?.classList.add('collapsed');
+        if (arrow) arrow.textContent = '▶';
+      }
+
+      // Restore sidebar scroll position
+      const sidebarContent = document.querySelector('.sidebar-content');
+      const savedScrollPos = sessionStorage.getItem('sidebarScrollPos');
+      if (sidebarContent && savedScrollPos !== null) {
+        sidebarContent.scrollTop = parseInt(savedScrollPos, 10);
+      }
+    });
+
+    // Save sidebar scroll position when clicking a generation item
+    document.querySelectorAll('.generation-item').forEach(item => {
+      item.addEventListener('click', function() {
+        const sidebarContent = document.querySelector('.sidebar-content');
+        if (sidebarContent) {
+          sessionStorage.setItem('sidebarScrollPos', sidebarContent.scrollTop);
+        }
+      });
+    });
+
+    // Clear scroll position when starting a new generation
+    const newGenBtn = document.querySelector('.new-generation-btn');
+    if (newGenBtn) {
+      newGenBtn.addEventListener('click', function() {
+        sessionStorage.removeItem('sidebarScrollPos');
+      });
+    }
+
+    // Header behavior: type on initial (no output), set immediately when showing result
+    const header = document.getElementById("dynamicHeader");
+    const text = "Stunning product photos in seconds.";
+    const isOutputPage = document.querySelector('.output-img') !== null;
+
+    if (isOutputPage) {
+      header.textContent = text;
+      header.style.transform = 'none';
+    } else {
+      let index = 0;
+      (function typeCentered() {
+        if (index <= text.length) {
+          header.textContent = text.substring(0, index);
+          header.style.transform = `translateX(calc(50% - ${header.offsetWidth / 2}px))`;
+          index++;
+          setTimeout(typeCentered, 50);
+        } else {
+          header.style.transform = 'none';
+        }
+      })();
+    }
+
+    // Upload/preview UI
+    const imageInput = document.getElementById('image');
+    const uploadBox = document.getElementById('uploadPlaceholder');
+    const preview = document.getElementById('preview');
+    const previewWrapper = document.getElementById('previewWrapper');
+    const removeBtn = document.getElementById('removeBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const spinner = document.getElementById('spinner');
+    const genForm = document.getElementById('genForm');
+    const blocked = genForm?.getAttribute('data-blocked') === '1';
+
+    if (uploadBox) uploadBox.addEventListener('click', () => imageInput.click());
+
+    if (imageInput) {
+      imageInput.addEventListener('change', () => {
+        const file = imageInput.files?.[0];
+        if (file) {
+          const url = URL.createObjectURL(file);
+          preview.src = url;
+          uploadBox.classList.add('hidden');
+          previewWrapper.classList.remove('hidden');
+          submitBtn.disabled = false;
+        }
+      });
+    }
+
+    if (removeBtn) {
+      removeBtn.addEventListener('click', () => {
+        preview.src = '';
+        imageInput.value = '';
+        previewWrapper.classList.add('hidden');
+        uploadBox.classList.remove('hidden');
+        submitBtn.disabled = true;
+      });
+    }
+
+    genForm?.addEventListener('submit', (e) => {
+      if (blocked) {
+        e.preventDefault();
+        window.location.href = "{{ url_for('upgrade') }}";
+        return;
+      }
+      submitBtn.disabled = true;
+      spinner.style.display = 'flex';
+    });
+
+    // Comparison modal functionality
+    const thumbnailImg = document.getElementById('thumbnailImg');
+    const comparisonModal = document.getElementById('comparisonModal');
+    const modalClose = document.getElementById('modalClose');
+
+    if (thumbnailImg) {
+      thumbnailImg.addEventListener('click', () => {
+        const inputImage = '{{ input_image }}';
+        const outputImage = '{{ output_image }}';
+        
+        if (inputImage && outputImage) {
+          document.getElementById('compareOriginal').src = inputImage;
+          document.getElementById('compareTransformed').src = outputImage;
+          comparisonModal.classList.add('show');
+        }
+      });
+    }
+
+    if (modalClose) {
+      modalClose.addEventListener('click', () => {
+        comparisonModal.classList.remove('show');
+      });
+    }
+
+    // Close modal when clicking outside images
+    if (comparisonModal) {
+      comparisonModal.addEventListener('click', (e) => {
+        if (e.target === comparisonModal) {
+          comparisonModal.classList.remove('show');
+        }
+      });
+    }
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && comparisonModal?.classList.contains('show')) {
+        comparisonModal.classList.remove('show');
+      }
+    });
+
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      const nav = document.getElementById('siteNav');
+      nav.classList.toggle('show');
+    }
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+      const nav = document.getElementById('siteNav');
+      const btn = document.getElementById('mobileMenuBtn');
+      if (nav && btn && !nav.contains(e.target) && !btn.contains(e.target)) {
+        nav.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html>
