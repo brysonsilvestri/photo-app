@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Account - StudioSix</title>
+  
+  <!-- Inter font & Bootstrap -->
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+  <style>
+    :root {
+      --bg-light: #f7f7fb;
+      --text-light: #000;
+      --chatgpt-blue: #0a7cff;
+      --header-height: 3rem;
+    }
+
+    body {
+      background-color: var(--bg-light);
+      font-family: 'Inter', sans-serif;
+      color: var(--text-light);
+      padding-top: calc(1.5rem + var(--header-height));
+      min-height: 100vh;
+    }
+
+    /* Site header */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-light);
+      padding: 1.5rem 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .site-logo {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #333;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+    }
+
+    .back-link {
+      padding: 0.5rem 1.25rem;
+      background: white;
+      color: #333;
+      border: none;
+      border-radius: 0.375rem;
+      text-decoration: none;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .back-link:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+      color: #333;
+    }
+
+    /* Main container */
+    .account-container {
+      max-width: 900px;
+      margin: 3rem auto;
+      padding: 0 1rem;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      color: #333;
+    }
+
+    /* Account cards */
+    .account-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      margin-bottom: 1.5rem;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .card-title i {
+      color: var(--chatgpt-blue);
+      font-size: 1.5rem;
+    }
+
+    /* Plan info */
+    .plan-badge {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: var(--chatgpt-blue);
+      color: white;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      font-size: 1.125rem;
+      margin-bottom: 1rem;
+    }
+
+    .plan-badge.free {
+      background: #999;
+    }
+
+    .plan-badge.starter {
+      background: #0a7cff;
+    }
+
+    .plan-badge.creator {
+      background: #6366f1;
+    }
+
+    .plan-badge.enterprise {
+      background: #333;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: #666;
+      font-weight: 500;
+    }
+
+    .info-value {
+      color: #333;
+      font-weight: 600;
+    }
+
+    /* Credits section */
+    .credits-display {
+      text-align: center;
+      padding: 2rem;
+      background: var(--bg-light);
+      border-radius: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .credits-number {
+      font-size: 3rem;
+      font-weight: 700;
+      color: #333;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .credits-label {
+      color: #666;
+      font-size: 0.9375rem;
+    }
+
+    .credit-bar-container {
+      margin-top: 1.5rem;
+    }
+
+    .credit-bar-label {
+      font-size: 0.875rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .credit-count {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .credit-bar-bg {
+      width: 100%;
+      height: 12px;
+      background: #e0e0e0;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .credit-bar-fill {
+      height: 100%;
+      background: var(--chatgpt-blue);
+      border-radius: 6px;
+      transition: width 0.3s ease;
+    }
+
+    /* Usage stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .stat-box {
+      background: var(--bg-light);
+      padding: 1.25rem;
+      border-radius: 0.5rem;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #333;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: #666;
+      font-size: 0.875rem;
+    }
+
+    /* Action buttons */
+    .btn-primary-custom {
+      display: inline-block;
+      padding: 0.875rem 1.75rem;
+      background: var(--chatgpt-blue);
+      color: white;
+      text-decoration: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .btn-primary-custom:hover {
+      background: #0968d9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(10, 124, 255, 0.3);
+      color: white;
+    }
+
+    .btn-secondary-custom {
+      display: inline-block;
+      padding: 0.875rem 1.75rem;
+      background: transparent;
+      color: #333;
+      text-decoration: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: 2px solid #ddd;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .btn-secondary-custom:hover {
+      border-color: #999;
+      background: var(--bg-light);
+      color: #333;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .site-header {
+        padding: 1rem 5%;
+      }
+      .site-logo {
+        font-size: 1.25rem;
+      }
+      .account-container {
+        margin: 2rem auto;
+      }
+      .page-title {
+        font-size: 1.75rem;
+      }
+      .account-card {
+        padding: 1.5rem;
+      }
+      .credits-number {
+        font-size: 2.5rem;
+      }
+      .stat-number {
+        font-size: 1.75rem;
+      }
+      .button-group {
+        flex-direction: column;
+      }
+      .btn-primary-custom,
+      .btn-secondary-custom {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Site Header -->
+  <div class="site-header">
+    <a href="{{ url_for('index') }}" class="site-logo">StudioSix</a>
+    <a href="{{ url_for('index') }}" class="back-link">
+      <i class="bi bi-arrow-left"></i>
+      Back to App
+    </a>
+  </div>
+
+  <div class="account-container">
+    <h1 class="page-title">My Account</h1>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Subscription Plan Card -->
+    <div class="account-card">
+      <h2 class="card-title">
+        <i class="bi bi-credit-card"></i>
+        Subscription Plan
+      </h2>
+      
+      {% if user.plan_tier == 'free' %}
+        <div class="plan-badge free">Free Plan</div>
+      {% elif user.plan_tier == 'starter' %}
+        <div class="plan-badge starter">Starter Plan</div>
+      {% elif user.plan_tier == 'creator' %}
+        <div class="plan-badge creator">Creator Plan</div>
+      {% elif user.plan_tier == 'enterprise' %}
+        <div class="plan-badge enterprise">Enterprise Plan</div>
+      {% elif user.plan_tier == 'legacy_pro' %}
+        <div class="plan-badge creator">Legacy Pro Plan</div>
+      {% else %}
+        <div class="plan-badge free">Free Plan</div>
+      {% endif %}
+
+      <div class="info-row">
+        <span class="info-label">Email</span>
+        <span class="info-value">{{ user.email }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Member Since</span>
+        <span class="info-value">{{ user.created_at.strftime('%B %d, %Y') }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Status</span>
+        <span class="info-value">{{ 'Active Subscription' if user.is_subscribed else 'Free Tier' }}</span>
+      </div>
+
+      <div class="button-group">
+        {% if user.is_subscribed %}
+          <a href="{{ url_for('billing_portal') }}" class="btn-secondary-custom">
+            <i class="bi bi-gear"></i> Manage Billing
+          </a>
+        {% else %}
+          <a href="{{ url_for('upgrade') }}" class="btn-primary-custom">
+            <i class="bi bi-arrow-up-circle"></i> Upgrade Plan
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Credits Card -->
+    <div class="account-card">
+      <h2 class="card-title">
+        <i class="bi bi-lightning-charge"></i>
+        Monthly Credits
+      </h2>
+
+      <div class="credits-display">
+        <div class="credits-number">{{ (user.credits_remaining | default(0) / 1000) | int }}k</div>
+        <div class="credits-label">credits remaining this month</div>
+      </div>
+
+      <div class="credit-bar-container">
+        <div class="credit-bar-label">
+          <span>Usage</span>
+          <span class="credit-count">{{ user.credits_remaining | default(0) | int | format_number }} / {{ user.credits_limit | default(0) | int | format_number }}</span>
+        </div>
+        <div class="credit-bar-bg">
+          <div class="credit-bar-fill" style="width: {{ ((user.credits_remaining | default(0) / user.credits_limit | default(1)) * 100) | int }}%"></div>
+        </div>
+      </div>
+
+      {% if not user.is_subscribed or user.plan_tier == 'starter' %}
+      <div class="button-group">
+        <a href="{{ url_for('upgrade') }}" class="btn-primary-custom">
+          Get More Credits
+        </a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Usage Statistics Card -->
+    <div class="account-card">
+      <h2 class="card-title">
+        <i class="bi bi-graph-up"></i>
+        Usage Statistics
+      </h2>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-number">{{ user.generation_count | default(0) }}</div>
+          <div class="stat-label">Total Images</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number">{{ ((user.credits_limit | default(0) - user.credits_remaining | default(0)) / 500) | int }}</div>
+          <div class="stat-label">This Month</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-number">{{ (user.credits_remaining | default(0) / 500) | int }}</div>
+          <div class="stat-label">Remaining</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
