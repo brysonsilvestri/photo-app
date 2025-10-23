@@ -137,7 +137,9 @@ def load_user(user_id):
 # --- Single white background prompt ---
 WHITE_BACKGROUND_PROMPT = """Using the provided image, identify the product in the photo and isolate it from all other objects
 around it. Place it on a white studio background with soft professional lighting. The product should be shot on a 50 mm lens and face directly 
-towards the lens. If and only when the product is a shoe, the product can be placed sideways with the lens."""
+towards the lens. If and only if the product is a shoe, the product may be placed sideways with the lens."""
+
+## prompt 2: """Using the provided image, identify the product in the photo and isolate it from all other objects around it. Place the product on a white background. Keep the product’s original size, color, shape, and lighting unchanged. Add a soft, neutral shadow directly beneath the product for realism. Do not enhance, retouch, or alter the product in any way."""
 
 # --- Stripe helpers ---
 def ensure_stripe_customer(user: User):
@@ -201,6 +203,19 @@ def resources():
 def pricing():
     """Pricing page with subscription tiers"""
     return render_template("pricing.html")
+
+# -----------------------
+# Legal Pages
+# -----------------------
+@app.route("/terms")
+def terms():
+    """Terms and Conditions page"""
+    return render_template("terms.html")
+
+@app.route("/privacy")
+def privacy():
+    """Privacy Policy page"""
+    return render_template("privacy.html")
 
 # -----------------------
 # Auth Routes

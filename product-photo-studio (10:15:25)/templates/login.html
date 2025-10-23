@@ -1,41 +1,360 @@
-{% set is_modal = request.args.get('modal') %}
-{% if not is_modal %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Login - AI Product Photo Studio</title>
+  <title>Log In - StudioSix</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <style>
-    :root { --bg-light: #f7f7fb; --text-light: #000; --chatgpt-blue: #0a7cff; }
+    :root {
+      --bg-light: #f7f7fb;
+      --text-light: #000;
+      --text-muted: #666;
+      --chatgpt-blue: #0a7cff;
+      --header-height: 3rem;
+    }
+
+    /* FONT SYSTEM - 5 Styles Only */
+    /* Style 1: Display/Hero - 2.5rem/700 */
+    /* Style 2: Section Header - 1.5rem/600 */
+    /* Style 3: Subsection - 1.25rem/600 */
+    /* Style 4: Body - 0.9375rem/400 */
+    /* Style 5: Small/Meta - 0.875rem/400 */
+
     body {
       background-color: var(--bg-light);
       font-family: 'Inter', sans-serif;
       color: var(--text-light);
+      font-size: 0.9375rem; /* Style 4: Body */
+      line-height: 1.5;
       min-height: 100vh;
       display: flex;
       align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      padding-top: calc(2rem + var(--header-height));
     }
-    .auth-card {
+
+    /* Site Header */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-light);
+      padding: 1.5rem 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .site-logo {
+      font-size: 1.5rem; /* Style 2: Section Header */
+      font-weight: 600;
+      color: #333;
+      letter-spacing: -0.02em;
+      text-decoration: none;
+    }
+
+    .site-nav {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .site-nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9375rem; /* Style 4: Body */
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .site-nav a:hover {
+      color: #333;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
       border: none;
-      border-radius: 1rem;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.08);
-      animation: fadeUp 0.6s ease-out;
-      max-width: 400px;
+      font-size: 1.5rem;
+      color: #333;
+      cursor: pointer;
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-left: 1.5rem;
+    }
+
+    .btn-login {
+      padding: 0.5rem 1.25rem;
+      background: white;
+      color: #333;
+      border: none;
+      border-radius: 0.375rem;
+      text-decoration: none;
+      font-size: 0.9375rem; /* Style 4: Body */
+      font-weight: 500;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-login:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+      color: #333;
+    }
+
+    .btn-signup {
+      padding: 0.5rem 1.25rem;
+      background: #333;
+      color: white !important;
+      border: none;
+      border-radius: 0.375rem;
+      text-decoration: none;
+      font-size: 0.9375rem; /* Style 4: Body */
+      font-weight: 500;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn-signup:hover {
+      background: #1a1a1a;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      transform: translateY(-1px);
+      color: white !important;
+    }
+
+    /* Main Container */
+    .container {
       width: 100%;
+      max-width: 1200px;
       margin: 0 auto;
     }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(30px);} to { opacity: 1; transform: translateY(0);} }
-    .btn-primary { background-color: var(--chatgpt-blue); border: none; }
-    .btn-primary:hover { background-color: #0968d9; }
+
+    /* Card */
+    .auth-card {
+      background: white;
+      border: none;
+      border-radius: 1rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      animation: fadeUp 0.6s ease-out;
+      max-width: 420px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+    }
+
+    @keyframes fadeUp { 
+      from { 
+        opacity: 0; 
+        transform: translateY(30px);
+      } 
+      to { 
+        opacity: 1; 
+        transform: translateY(0);
+      } 
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 1.5rem; /* Style 2: Section Header */
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      margin-top: 0;
+      color: #333;
+      line-height: 1.2;
+    }
+
+    /* Form Elements */
+    .form-label {
+      display: block;
+      font-size: 0.875rem; /* Style 5: Small/Meta */
+      font-weight: 600;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+      width: 100%;
+      height: 48px;
+      padding: 0 1rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      font-size: 0.9375rem; /* Style 4: Body */
+      font-family: inherit;
+      transition: all 0.2s ease;
+      background: white;
+      color: var(--text-light);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--chatgpt-blue);
+      box-shadow: 0 0 0 3px rgba(10, 124, 255, 0.1);
+    }
+
+    .form-check {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-check-label {
+      font-size: 0.875rem; /* Style 5: Small/Meta */
+      color: var(--text-light);
+    }
+
+    .btn-primary {
+      width: 100%;
+      height: 48px;
+      background-color: var(--chatgpt-blue);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 0.9375rem; /* Style 4: Body */
+      font-weight: 600;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(10, 124, 255, 0.2);
+    }
+
+    .btn-primary:hover {
+      background-color: #0968d9;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(10, 124, 255, 0.3);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    /* Footer Text */
+    .text-center {
+      text-align: center;
+    }
+
+    .text-center p {
+      font-size: 0.875rem; /* Style 5: Small/Meta */
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .text-center a {
+      color: var(--chatgpt-blue);
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .text-center a:hover {
+      color: #0968d9;
+    }
+
+    /* Alert */
+    .alert {
+      border-radius: 0.5rem;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.875rem; /* Style 5: Small/Meta */
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+        padding-top: calc(1rem + var(--header-height));
+      }
+
+      .site-header {
+        padding: 1rem 5%;
+      }
+
+      .site-logo {
+        font-size: 1.25rem; /* Style 3: Subsection */
+      }
+
+      .site-nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 5%;
+        background: white;
+        flex-direction: column;
+        gap: 0;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin-top: 0.5rem;
+        min-width: 200px;
+      }
+
+      .site-nav.show {
+        display: flex;
+      }
+
+      .site-nav a {
+        padding: 0.5rem;
+      }
+
+      .auth-buttons {
+        flex-direction: row;
+        width: auto;
+        margin-left: 0;
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid #eee;
+        justify-content: center;
+        gap: 0.5rem;
+      }
+
+      .btn-login,
+      .btn-signup {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem; /* Style 5: Small/Meta */
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .auth-card {
+        padding: 2rem 1.5rem;
+      }
+
+      h2 {
+        font-size: 1.25rem; /* Style 3: Subsection */
+      }
+    }
   </style>
 </head>
+
 <body>
+  <!-- Site Header -->
+  <div class="site-header">
+    <a href="{{ url_for('index') }}" class="site-logo">StudioSix</a>
+    <nav class="site-nav" id="siteNav">
+      <a href="{{ url_for('index') }}">Product</a>
+      <a href="{{ url_for('resources') }}">Resources</a>
+      <a href="{{ url_for('pricing') }}">Pricing</a>
+      <div class="auth-buttons">
+        <a href="{{ url_for('login') }}" class="btn-login">Log in</a>
+        <a href="{{ url_for('signup') }}" class="btn-signup">Sign up</a>
+      </div>
+    </nav>
+    <button class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">☰</button>
+  </div>
+
   <div class="container">
-    <div class="card auth-card p-4">
-      <h2 class="text-center mb-4">Welcome Back</h2>
+    <div class="card auth-card">
+      <h2>Welcome Back</h2>
 
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -54,10 +373,12 @@
 
       <form method="POST" action="{{ url_for('login', next=request.args.get('next', url_for('index'))) }}">
         <input type="hidden" name="next" value="{{ request.args.get('next', url_for('index')) }}">
+        
         <div class="mb-3">
           <label for="email" class="form-label">Email</label>
           <input type="email" class="form-control" id="email" name="email" required autofocus>
         </div>
+        
         <div class="mb-3">
           <label for="password" class="form-label">Password</label>
           <input type="password" class="form-control" id="password" name="password" required>
@@ -68,7 +389,7 @@
           <label class="form-check-label" for="remember">Remember me</label>
         </div>
 
-        <button type="submit" class="btn btn-primary w-100 mb-3">Log In</button>
+        <button type="submit" class="btn btn-primary mb-3">Log In</button>
       </form>
 
       <p class="text-center mb-0">
@@ -79,52 +400,21 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      const nav = document.getElementById('siteNav');
+      nav.classList.toggle('show');
+    }
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+      const nav = document.getElementById('siteNav');
+      const btn = document.getElementById('mobileMenuBtn');
+      if (nav && btn && !nav.contains(e.target) && !btn.contains(e.target)) {
+        nav.classList.remove('show');
+      }
+    });
+  </script>
 </body>
 </html>
-{% else %}
-{# ---------- MODAL/FRAGMENT VERSION (no <html>/<head>) ---------- #}
-<div class="form-errors"></div>
-
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
-
-{% if error %}
-  <div class="alert alert-danger">{{ error }}</div>
-{% endif %}
-
-<form method="POST" action="{{ url_for('login', modal=1, next=request.args.get('next', url_for('index'))) }}">
-  <input type="hidden" name="next" value="{{ request.args.get('next', url_for('index')) }}">
-  <div class="mb-3">
-    <label for="email_modal" class="form-label">Email</label>
-    <input type="email" class="form-control" id="email_modal" name="email" required autofocus>
-  </div>
-  <div class="mb-3">
-    <label for="password_modal" class="form-label">Password</label>
-    <input type="password" class="form-control" id="password_modal" name="password" required>
-  </div>
-
-  <div class="form-check mb-3">
-    <input class="form-check-input" type="checkbox" value="1" id="remember_modal" name="remember">
-    <label class="form-check-label" for="remember_modal">Remember me</label>
-  </div>
-
-  <button type="submit" class="btn btn-primary w-100 mb-2">Log In</button>
-</form>
-
-<p class="text-center mb-0">
-  Don’t have an account?
-  <a href="{{ url_for('signup', modal=1, next=request.args.get('next', url_for('index'))) }}"
-     data-bs-toggle="tab" data-bs-target="#signup-pane"
-     onclick="event.preventDefault(); document.querySelector('#signup-tab')?.click();">
-    Sign up
-  </a>
-</p>
-{% endif %}

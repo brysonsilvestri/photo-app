@@ -583,7 +583,7 @@
             </div>
             <div class="price-annual-note" id="free-note"></div>
           </div>
-          <a href="{{ url_for('signup', plan='free') }}" class="plan-cta" id="free-cta">Get Started</a>
+          <a href="{{ url_for('signup', plan='free') }}" class="plan-cta">Get Started</a>
           <ul class="plan-features">
             <li><i class="bi bi-check-circle-fill"></i> 15 images per month</li>
             <li><i class="bi bi-check-circle-fill"></i> White background removal</li>
@@ -658,7 +658,7 @@
             </div>
             <div class="price-annual-note" id="enterprise-note">Billed annually at $990</div>
           </div>
-          <a href="{{ url_for('signup', plan='enterprise', billing='monthly') }}" class="plan-cta" id="enterprise-cta">Get Started</a>
+          <a href="{{ url_for('signup', plan='starter', billing='monthly') }}" class="plan-cta" id="starter-cta">Get Started</a>
           <ul class="plan-features">
             <li><i class="bi bi-check-circle-fill"></i> 1,600 images per month</li>
             <li><i class="bi bi-check-circle-fill"></i> White background removal</li>
@@ -734,7 +734,6 @@
     function updateCTALinks() {
       const billing = isAnnual ? 'annual' : 'monthly';
       
-      document.getElementById('free-cta').href = `/signup?plan=free`;
       document.getElementById('starter-cta').href = `/signup?plan=starter&billing=${billing}`;
       document.getElementById('creator-cta').href = `/signup?plan=creator&billing=${billing}`;
       document.getElementById('enterprise-cta').href = `/signup?plan=enterprise&billing=${billing}`;

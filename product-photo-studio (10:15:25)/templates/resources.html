@@ -18,14 +18,24 @@
     :root {
       --bg-light: #f7f7fb;
       --text-light: #000;
+      --text-muted: #666;
       --chatgpt-blue: #0a7cff;
       --header-height: 3rem;
     }
+
+    /* FONT SYSTEM - 5 Styles Only */
+    /* Style 1: Display/Hero - 2.5rem/700 */
+    /* Style 2: Section Header - 1.5rem/600 */
+    /* Style 3: Subsection - 1.25rem/600 */
+    /* Style 4: Body - 0.9375rem/400 */
+    /* Style 5: Small/Meta - 0.875rem/400 */
 
     body {
       background-color: var(--bg-light);
       font-family: 'Inter', sans-serif;
       color: var(--text-light);
+      font-size: 0.9375rem; /* Style 4: Body */
+      line-height: 1.5;
       padding-top: calc(1.5rem + var(--header-height));
     }
 
@@ -45,7 +55,7 @@
     }
 
     .site-logo {
-      font-size: 1.5rem;
+      font-size: 1.5rem; /* Style 2: Section Header */
       font-weight: 600;
       color: #333;
       letter-spacing: -0.02em;
@@ -59,9 +69,9 @@
     }
 
     .site-nav a {
-      color: #666;
+      color: var(--text-muted);
       text-decoration: none;
-      font-size: 0.9375rem;
+      font-size: 0.9375rem; /* Style 4: Body */
       font-weight: 500;
       transition: color 0.2s ease;
     }
@@ -94,7 +104,7 @@
       border: none;
       border-radius: 0.375rem;
       text-decoration: none;
-      font-size: 0.9375rem;
+      font-size: 0.9375rem; /* Style 4: Body */
       font-weight: 500;
       transition: all 0.2s ease;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -113,7 +123,7 @@
       border: none;
       border-radius: 0.375rem;
       text-decoration: none;
-      font-size: 0.9375rem;
+      font-size: 0.9375rem; /* Style 4: Body */
       font-weight: 500;
       transition: all 0.2s ease;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -132,19 +142,32 @@
       padding: 4rem 1rem 3rem;
       max-width: 800px;
       margin: 0 auto;
+      animation: fadeUp 0.6s ease-out;
+    }
+
+    @keyframes fadeUp { 
+      from { 
+        opacity: 0; 
+        transform: translateY(30px);
+      } 
+      to { 
+        opacity: 1; 
+        transform: translateY(0);
+      } 
     }
 
     .hero h1 {
-      font-size: 2.5rem;
+      font-size: 2.5rem; /* Style 1: Display/Hero */
       font-weight: 700;
       margin-bottom: 1rem;
       color: #333;
+      line-height: 1.2;
     }
 
     .hero p {
-      font-size: 1.125rem;
-      color: #666;
-      line-height: 1.6;
+      font-size: 0.9375rem; /* Style 4: Body */
+      color: var(--text-muted);
+      line-height: 1.5;
     }
 
     /* Use Cases Section */
@@ -152,14 +175,16 @@
       max-width: 1200px;
       margin: 3rem auto;
       padding: 0 1rem;
+      animation: fadeUp 0.6s ease-out 0.2s both;
     }
 
     .section-title {
       text-align: center;
-      font-size: 2rem;
+      font-size: 1.5rem; /* Style 2: Section Header */
       font-weight: 600;
       margin-bottom: 3rem;
       color: #333;
+      line-height: 1.2;
     }
 
     .use-case-grid {
@@ -174,7 +199,7 @@
       border-radius: 1rem;
       padding: 2rem;
       box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .use-case-card:hover {
@@ -194,20 +219,22 @@
     }
 
     .use-case-icon i {
-      font-size: 2rem;
-      color: #666;
+      font-size: 1.5rem; /* Style 2: Section Header */
+      color: var(--text-muted);
     }
 
     .use-case-card h3 {
-      font-size: 1.25rem;
+      font-size: 1.25rem; /* Style 3: Subsection */
       font-weight: 600;
       margin-bottom: 0.75rem;
       color: #333;
+      line-height: 1.2;
     }
 
     .use-case-card p {
-      color: #666;
-      line-height: 1.6;
+      color: var(--text-muted);
+      font-size: 0.9375rem; /* Style 4: Body */
+      line-height: 1.5;
       margin-bottom: 0;
     }
 
@@ -216,6 +243,7 @@
       max-width: 900px;
       margin: 0 auto 4rem;
       padding: 0 1rem;
+      animation: fadeUp 0.6s ease-out 0.4s both;
     }
 
     .best-practices-content {
@@ -226,10 +254,11 @@
     }
 
     .best-practices h3 {
-      font-size: 1.5rem;
+      font-size: 1.5rem; /* Style 2: Section Header */
       font-weight: 600;
       margin-bottom: 1.5rem;
       color: #333;
+      line-height: 1.2;
     }
 
     .tips-list {
@@ -256,20 +285,21 @@
 
     .tip-icon i {
       color: var(--chatgpt-blue);
-      font-size: 1rem;
+      font-size: 0.9375rem; /* Style 4: Body */
     }
 
     .tip-content h4 {
-      font-size: 1rem;
+      font-size: 0.9375rem; /* Style 4: Body */
       font-weight: 600;
       margin-bottom: 0.5rem;
       color: #333;
     }
 
     .tip-content p {
-      color: #666;
+      color: var(--text-muted);
+      font-size: 0.9375rem; /* Style 4: Body */
       margin: 0;
-      line-height: 1.6;
+      line-height: 1.5;
     }
 
     /* CTA Section */
@@ -278,19 +308,22 @@
       padding: 4rem 1rem;
       max-width: 700px;
       margin: 0 auto;
+      animation: fadeUp 0.6s ease-out 0.6s both;
     }
 
     .cta-section h2 {
-      font-size: 2rem;
+      font-size: 1.5rem; /* Style 2: Section Header */
       font-weight: 600;
       margin-bottom: 1rem;
       color: #333;
+      line-height: 1.2;
     }
 
     .cta-section p {
-      font-size: 1.125rem;
-      color: #666;
+      font-size: 0.9375rem; /* Style 4: Body */
+      color: var(--text-muted);
       margin-bottom: 2rem;
+      line-height: 1.5;
     }
 
     .cta-btn {
@@ -300,13 +333,21 @@
       color: white;
       text-decoration: none;
       border-radius: 0.5rem;
+      font-size: 0.9375rem; /* Style 4: Body */
       font-weight: 600;
-      transition: background 0.3s ease;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(10, 124, 255, 0.2);
     }
 
     .cta-btn:hover {
       background: #0968d9;
       color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(10, 124, 255, 0.3);
+    }
+
+    .cta-btn:active {
+      transform: translateY(0);
     }
 
     /* Mobile Responsive */
@@ -344,16 +385,22 @@
       .btn-login,
       .btn-signup {
         padding: 0.5rem 1rem;
-        font-size: 0.875rem;
+        font-size: 0.875rem; /* Style 5: Small/Meta */
       }
       .mobile-menu-btn {
         display: block;
+      }
+      .site-header {
+        padding: 1rem 5%;
+      }
+      .site-logo {
+        font-size: 1.25rem; /* Style 3: Subsection */
       }
       .hero h1 {
         font-size: 2rem;
       }
       .hero p {
-        font-size: 1rem;
+        font-size: 0.9375rem;
       }
       .use-case-grid {
         grid-template-columns: 1fr;
@@ -443,6 +490,7 @@
 
       </div>
     </section>
+
     <!-- CTA Section -->
     <section class="cta-section">
       <h2>Ready to Transform Your Product Photos?</h2>
