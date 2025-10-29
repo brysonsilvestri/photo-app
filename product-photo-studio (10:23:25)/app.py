@@ -136,8 +136,14 @@ def load_user(user_id):
 
 # --- Single white background prompt ---
 WHITE_BACKGROUND_PROMPT = """Using the provided image, identify the product in the photo and isolate it from all other objects
-around it. Place it on a white studio background with soft professional lighting. The product should be shot on a 50 mm lens and face directly 
-towards the lens. If and only if the product is a shoe, the product may be placed sideways with the lens."""
+around it. Place it on a white studio background with soft professional lighting. Use a pure white background (#ffffff) The product should be shot on a 50 mm lens and face directly 
+towards the lens. If and only if the product is a shoe, the product may be placed sideways with the lens"""
+
+## original promi: Using the provided image, identify the product in the photo and isolate it from all other objects
+## around it. Place it on a white studio background with soft professional lighting. The product should be shot on a 50 mm lens and face directly 
+## towards the lens. If and only if the product is a shoe, the product may be placed sideways with the lens
+
+## prompt 3 Realestate: Stage this empty living room with a cohesive set of modern, minimalist furniture—low-profile sofa, area rug, coffee table, 1–2 accent chairs, and a slender floor lamp—scaled to the room and leaving clear walkways. Fill the room with an appropriate amount of furiture, do not leave odd empty space on the edges. Add contemporary art to the walls but do not change the architecture. Preserve the existing architecture, perspective, and daylight direction, and render materials (linen/bouclé, oak/walnut, stone, matte metal) with physically correct contact shadows, subtle reflections, and fine texture for a hyper-photorealistic editorial look. Make the photo vibrant like a professional realestate staging photo. Use a warm-neutral palette with one muted accent color and avoid text, logos, clutter, distortions, or floating objects. The dimensions of the output photo must be the same dimesnions of the input photo.
 
 ## prompt 2: """Using the provided image, identify the product in the photo and isolate it from all other objects around it. Place the product on a white background. Keep the product’s original size, color, shape, and lighting unchanged. Add a soft, neutral shadow directly beneath the product for realism. Do not enhance, retouch, or alter the product in any way."""
 
